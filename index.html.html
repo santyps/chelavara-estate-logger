@@ -1,0 +1,4706 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Chelavara">
+  <meta name="application-name" content="Chelavara">
+  <meta name="theme-color" content="#433863">
+  <link rel="apple-touch-icon" id="appleTouchIconLink" sizes="180x180" href="">
+  <link rel="icon" type="image/png" id="favIconLink" href="">
+  <link rel="manifest" id="pwaManifestLink" href="">
+  <title>Chelavara Estate Logger</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --canvas-bg: #433863;
+      --canvas-grad: linear-gradient(180deg, #433863 0%, #33294f 100%);
+      --surface-1: #362c52;
+      --surface-2: #2b2243;
+      --surface-solid: #31274b;
+      --input-bg: #251d3a;
+      --card-peach: #f3c58b;
+      --pill-cream: #fdfaf6;
+      --ink-dark: #2d2447;
+      --text-primary: #fdfaf6;
+      --text-secondary: #b9b0d4;
+      --border-subtle: rgba(255, 255, 255, 0.11);
+      --border-strong: rgba(255, 255, 255, 0.22);
+      --accent-labour: #f3c58b;
+      --accent-labour-bg: rgba(243, 197, 139, 0.16);
+      --accent-harvest: #b497f8;
+      --accent-harvest-bg: rgba(180, 151, 248, 0.16);
+      --accent-sale: #7dd3fc;
+      --accent-sale-bg: rgba(125, 211, 252, 0.16);
+      --accent-danger: #f59d8d;
+      --accent-danger-bg: rgba(245, 157, 141, 0.18);
+      --accent-positive: #6ee7b7;
+      --radius-xs: 10px;
+      --radius-sm: 14px;
+      --radius-md: 18px;
+      --radius-lg: 22px;
+      --radius-xl: 28px;
+      --radius-full: 9999px;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    [data-theme="light"] {
+      --canvas-bg: #f4efe6;
+      --canvas-grad: linear-gradient(180deg, #f4efe6 0%, #eae2d6 100%);
+      --surface-1: #ffffff;
+      --surface-2: #ede5d8;
+      --surface-solid: #ffffff;
+      --input-bg: #f7f3eb;
+      --card-peach: #f3c58b;
+      --pill-cream: #fdfaf6;
+      --ink-dark: #2d2447;
+      --text-primary: #2d2447;
+      --text-secondary: #6e638a;
+      --border-subtle: rgba(45, 36, 71, 0.11);
+      --border-strong: rgba(45, 36, 71, 0.22);
+      --accent-labour-bg: rgba(243, 197, 139, 0.28);
+      --accent-harvest: #6d4aff;
+      --accent-harvest-bg: rgba(109, 74, 255, 0.12);
+      --accent-sale: #0284c7;
+      --accent-sale-bg: rgba(2, 132, 199, 0.12);
+      --accent-danger: #e15b48;
+      --accent-danger-bg: rgba(225, 91, 72, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      background-color: var(--canvas-bg);
+      background-image: var(--canvas-grad);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: calc(96px + env(safe-area-inset-bottom));
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, select, input, textarea {
+      font-family: inherit;
+      touch-action: manipulation;
+      cursor: pointer;
+    }
+
+    @view-transition {
+      navigation: auto;
+    }
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation-duration: 180ms;
+      animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      ::view-transition-old(root),
+      ::view-transition-new(root) {
+        animation: none !important;
+      }
+    }
+
+    .tabular-nums,
+    .kpi-value,
+    .balance-pill,
+    .snapshot-cell-val,
+    .log-amt,
+    .ledger-hero-amount,
+    .ledger-metric-box strong,
+    .scale-badge,
+    .form-live-preview strong,
+    .cal-day-cell,
+    input[type="number"] {
+      font-variant-numeric: tabular-nums;
+      font-family: var(--font-mono);
+    }
+
+    h1, h2, h3,
+    .brand-info h1,
+    .worker-strip-title,
+    .kpi-label,
+    .dayoff-banner-title,
+    .modal-title-group h2,
+    .ledger-hero-title {
+      text-wrap: balance;
+    }
+    p,
+    .log-sub,
+    .dayoff-banner-sub,
+    .modal-title-group p {
+      text-wrap: pretty;
+    }
+
+    .app-viewport {
+      max-width: 460px;
+      margin: 0 auto;
+      padding: 16px max(16px, env(safe-area-inset-right)) 16px max(16px, env(safe-area-inset-left));
+    }
+
+    /* Minimal Top Header */
+    .top-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      gap: 8px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-emblem {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      corner-shape: squircle;
+      background: var(--card-peach);
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      box-shadow: 0 8px 20px rgba(25, 18, 45, 0.28);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .brand-emblem.spinning {
+      transform: rotate(720deg);
+    }
+    .brand-emblem svg {
+      width: 24px;
+      height: 24px;
+      pointer-events: none;
+    }
+
+    .brand-info h1 {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .sky-toggle-pill {
+      width: 60px;
+      height: 44px;
+      min-height: 44px;
+      border-radius: var(--radius-full);
+      background: var(--surface-2);
+      border: 1px solid var(--border-subtle);
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      padding: 4px 6px;
+      display: flex;
+      align-items: center;
+    }
+    [data-theme="light"] .sky-toggle-pill {
+      background: #e2d6c5;
+    }
+
+    .sky-orb {
+      width: 26px;
+      height: 26px;
+      border-radius: var(--radius-full);
+      background: var(--card-peach);
+      transform: translateX(20px);
+      transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+      position: relative;
+      z-index: 2;
+      pointer-events: none;
+    }
+    [data-theme="light"] .sky-orb {
+      transform: translateX(0);
+      background: #433863;
+    }
+
+    .icon-action-btn {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      border-radius: 15px;
+      corner-shape: squircle;
+      background: var(--surface-1);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      box-shadow: 0 6px 16px rgba(20, 14, 38, 0.22);
+      transition: transform 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .icon-action-btn:active {
+      transform: scale(0.95);
+    }
+    .icon-action-btn svg {
+      pointer-events: none;
+    }
+    .icon-action-btn.has-filter::after {
+      content: '';
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--card-peach);
+    }
+
+    /* Warm Peach-Gold Hero Card */
+    .worker-strip-card {
+      background: var(--card-peach);
+      color: var(--ink-dark);
+      border: none;
+      border-radius: var(--radius-xl);
+      corner-shape: squircle;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 16px 34px rgba(22, 16, 42, 0.32);
+      position: relative;
+      view-transition-name: worker-hero-card;
+    }
+
+    .worker-strip-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .worker-strip-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .worker-avatar-badge {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      corner-shape: squircle;
+      background: var(--ink-dark);
+      border: 2.5px solid var(--pill-cream);
+      box-shadow: 0 6px 16px rgba(45, 36, 71, 0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .worker-avatar-badge svg, .worker-avatar-badge img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
+
+    .worker-strip-details {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .worker-strip-title {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(45, 36, 71, 0.62);
+    }
+
+    .worker-select-inline {
+      background: transparent;
+      border: none;
+      color: var(--ink-dark);
+      font-size: 19px;
+      font-weight: 800;
+      outline: none;
+      cursor: pointer;
+      width: 100%;
+      min-height: 44px;
+      letter-spacing: -0.02em;
+    }
+
+    .worker-strip-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .balance-pill {
+      min-height: 44px;
+      padding: 0 13px;
+      border-radius: 13px;
+      corner-shape: squircle;
+      font-size: 13px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      display: inline-flex;
+      align-items: center;
+      background: var(--ink-dark);
+      color: var(--pill-cream);
+      border: none;
+      box-shadow: 0 6px 14px rgba(45, 36, 71, 0.22);
+      cursor: pointer;
+      transition: opacity 0.15s ease, transform 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .balance-pill.positive {
+      background: #235347;
+      color: #ffffff;
+    }
+    .balance-pill.revalidating {
+      opacity: 0.75;
+    }
+
+    .strip-mini-btn {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      border-radius: 13px;
+      corner-shape: squircle;
+      border: none;
+      background: rgba(45, 36, 71, 0.12);
+      color: var(--ink-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .strip-mini-btn svg {
+      width: 17px;
+      height: 17px;
+      pointer-events: none;
+    }
+
+    .worker-snapshot-divider {
+      border-top: 1.5px dashed rgba(45, 36, 71, 0.22);
+      margin: 0 -6px;
+      position: relative;
+    }
+
+    .worker-snapshot-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .snapshot-cell {
+      background: rgba(45, 36, 71, 0.08);
+      border: none;
+      border-radius: 12px;
+      corner-shape: squircle;
+      min-height: 48px;
+      padding: 8px 6px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      transition: background 0.15s ease, transform 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .snapshot-cell:active {
+      background: rgba(45, 36, 71, 0.16);
+      transform: scale(0.97);
+    }
+    .snapshot-cell-label {
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: rgba(45, 36, 71, 0.68);
+      pointer-events: none;
+    }
+    .snapshot-cell-val {
+      font-size: 12.5px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--ink-dark);
+      pointer-events: none;
+    }
+    .snapshot-cell-sub {
+      font-size: 9px;
+      font-weight: 700;
+      color: rgba(45, 36, 71, 0.65);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+    }
+
+    /* KPI Strip */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .kpi-card {
+      background: var(--surface-1);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      corner-shape: squircle;
+      padding: 12px 13px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 8px 20px rgba(22, 16, 42, 0.18);
+    }
+
+    .kpi-label {
+      font-size: 9.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .kpi-card:nth-child(1) .kpi-label { color: var(--card-peach); }
+    .kpi-card:nth-child(2) .kpi-label { color: var(--accent-harvest); }
+    .kpi-card:nth-child(3) .kpi-label { color: var(--accent-danger); }
+
+    .kpi-value {
+      font-size: 15.5px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      margin: 5px 0 2px 0;
+      color: var(--text-primary);
+    }
+
+    .kpi-sub {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* Segment Switcher */
+    .segment-container {
+      display: flex;
+      background: var(--surface-2);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 5px;
+      margin-bottom: 16px;
+      gap: 6px;
+    }
+
+    .segment-btn {
+      flex: 1;
+      min-height: 44px;
+      border: none;
+      background: transparent;
+      border-radius: var(--radius-full);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.15s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.15s ease, color 0.15s ease;
+    }
+    .segment-btn.active {
+      background: var(--card-peach);
+      color: var(--ink-dark);
+      font-weight: 800;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Main Entry Card */
+    .glass-card {
+      background: var(--surface-1);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      corner-shape: squircle;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 18px 40px rgba(18, 12, 36, 0.28);
+      view-transition-name: main-stage-panel;
+    }
+
+    .dayoff-mode-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-2);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      corner-shape: squircle;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+    }
+    .dayoff-mode-banner.active {
+      background: var(--accent-danger-bg);
+      border-color: var(--accent-danger);
+    }
+    .dayoff-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .dayoff-banner-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+    .dayoff-toggle-btn {
+      min-height: 44px;
+      padding: 0 14px;
+      border-radius: var(--radius-full);
+      border: none;
+      background: var(--surface-1);
+      color: var(--text-secondary);
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .dayoff-mode-banner.active .dayoff-toggle-btn {
+      background: var(--accent-danger);
+      color: var(--ink-dark);
+    }
+
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .field-label {
+      font-size: 10.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2px;
+    }
+
+    .label-action-btn {
+      background: none;
+      border: none;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--card-peach);
+      cursor: pointer;
+      padding: 4px 6px;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+    .label-action-btn::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      bottom: -10px;
+      left: -8px;
+      right: -8px;
+    }
+
+    .input-box, .select-box {
+      width: 100%;
+      height: 48px;
+      min-height: 48px;
+      border: 1.5px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      corner-shape: squircle;
+      padding: 10px 14px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      background: var(--input-bg);
+      outline: none;
+      box-sizing: border-box;
+      line-height: normal;
+      transition: border-color 0.15s ease;
+    }
+    .input-box:focus, .select-box:focus {
+      border-color: var(--card-peach);
+    }
+    .input-box:disabled, .select-box:disabled {
+      opacity: 0.45;
+    }
+
+    input[type="date"].input-box {
+      height: 48px;
+      min-height: 48px;
+      padding: 10px 14px;
+      box-sizing: border-box;
+      color-scheme: dark;
+    }
+    [data-theme="light"] input[type="date"].input-box {
+      color-scheme: light;
+    }
+
+    /* Cream Pill Dock for Stacked Avatars */
+    .stacked-avatar-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      background: var(--pill-cream);
+      padding: 6px 8px;
+      border-radius: var(--radius-full);
+      box-shadow: 0 8px 20px rgba(18, 12, 36, 0.25);
+      max-width: 100%;
+    }
+
+    .stacked-avatars-row {
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .stacked-avatar-item {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      border-radius: var(--radius-full);
+      border: 2.5px solid var(--pill-cream);
+      margin-left: -10px;
+      cursor: pointer;
+      position: relative;
+      background: var(--surface-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+      transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .stacked-avatar-item:first-child {
+      margin-left: 0;
+    }
+    .stacked-avatar-item.active {
+      transform: scale(1.12);
+      z-index: 40 !important;
+      border-color: var(--ink-dark);
+      box-shadow: 0 4px 10px rgba(45, 36, 71, 0.35);
+    }
+    .stacked-avatar-item svg, .stacked-avatar-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
+
+    .stacked-add-btn {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      border-radius: var(--radius-full);
+      background: var(--accent-danger);
+      color: var(--ink-dark);
+      border: 2px solid var(--pill-cream);
+      font-size: 20px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-left: 2px;
+    }
+
+    .stacked-active-name-tag {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--ink-dark);
+      background: var(--card-peach);
+      padding: 3px 12px;
+      border-radius: var(--radius-full);
+    }
+
+    .quick-chips-row {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 6px;
+    }
+
+    .quick-chip {
+      min-height: 44px;
+      padding: 0 14px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-2);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .quick-chip.active {
+      background: var(--card-peach);
+      color: var(--ink-dark);
+      border-color: var(--card-peach);
+      font-weight: 800;
+    }
+
+    /* Digital Scale Bar */
+    .scale-trigger-bar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-2);
+      border: 1px dashed var(--card-peach);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      cursor: pointer;
+      color: var(--card-peach);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .scale-badge {
+      background: var(--card-peach);
+      color: var(--ink-dark);
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    /* Deductions Accordion */
+    .accordion-box {
+      background: var(--surface-2);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      margin-bottom: 14px;
+      overflow: hidden;
+    }
+    .accordion-header {
+      width: 100%;
+      min-height: 46px;
+      padding: 12px 14px;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 12.5px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+    .accordion-body {
+      display: none;
+      padding: 4px 14px 14px 14px;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .accordion-box.open .accordion-body {
+      display: block;
+    }
+
+    /* Perforated Receipt Ticket Preview */
+    .form-live-preview {
+      background: var(--card-peach);
+      color: var(--ink-dark);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12.5px;
+      font-weight: 700;
+      border-top: 2px dashed rgba(45, 36, 71, 0.28);
+    }
+    .form-live-preview strong {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .primary-btn {
+      width: 100%;
+      min-height: 52px;
+      border-radius: var(--radius-md);
+      corner-shape: squircle;
+      background: var(--ink-dark);
+      color: var(--pill-cream);
+      border: 1.5px solid rgba(255, 255, 255, 0.14);
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 10px 22px rgba(18, 12, 36, 0.32);
+      transition: transform 0.15s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.15s ease;
+    }
+    .primary-btn:active {
+      transform: scale(0.98);
+    }
+    .primary-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    [data-theme="light"] .primary-btn {
+      background: #433863;
+      color: #ffffff;
+    }
+    .primary-btn.secondary-btn {
+      background: var(--surface-2);
+      color: var(--text-primary);
+      box-shadow: none;
+    }
+    .primary-btn.danger-btn {
+      background: var(--accent-danger);
+      color: var(--ink-dark);
+    }
+
+    /* Bottom Dock & FAB */
+    .bottom-dock {
+      position: fixed;
+      bottom: calc(14px + env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 428px;
+      background: var(--surface-solid);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-full);
+      padding: 6px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      z-index: 90;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .dock-btn {
+      min-height: 48px;
+      border: none;
+      background: transparent;
+      border-radius: var(--radius-full);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .dock-btn.active {
+      background: var(--card-peach);
+      color: var(--ink-dark);
+    }
+
+    .fab-container {
+      position: fixed;
+      right: max(20px, calc((100vw - 460px) / 2 + 20px));
+      bottom: calc(82px + env(safe-area-inset-bottom));
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .fab-speed-dial {
+      display: none;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .fab-speed-dial.open {
+      display: flex;
+    }
+
+    .fab-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .fab-label {
+      background: var(--surface-solid);
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 800;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+    }
+
+    .fab-sub-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-full);
+      background: var(--card-peach);
+      color: var(--ink-dark);
+      border: 2px solid var(--pill-cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+      pointer-events: none;
+    }
+
+    .fab-main-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 20px;
+      corner-shape: squircle;
+      background: var(--accent-danger);
+      color: var(--ink-dark);
+      border: 2.5px solid var(--pill-cream);
+      box-shadow: 0 12px 28px rgba(20, 14, 38, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 30px;
+      font-weight: 800;
+      line-height: 1;
+      padding: 0;
+      margin: 0;
+      text-align: center;
+      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .fab-main-btn.rotate {
+      transform: rotate(135deg);
+    }
+
+    /* Centered Modals & Swipe-to-Dismiss Sheets */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(24, 18, 43, 0.82);
+      align-items: center;
+      justify-content: center;
+      z-index: 120;
+      padding: 16px max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    }
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-sheet {
+      background: var(--surface-solid);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-xl);
+      corner-shape: squircle;
+      width: 100%;
+      max-width: 440px;
+      max-height: 88vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+      padding: 14px 20px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      -webkit-overflow-scrolling: touch;
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform;
+    }
+
+    .sheet-drag-handle {
+      width: 42px;
+      height: 5px;
+      border-radius: var(--radius-full);
+      background: var(--border-strong);
+      margin: 0 auto 2px auto;
+      cursor: grab;
+      flex-shrink: 0;
+      touch-action: none;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-title-group h2 {
+      font-size: 16.5px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+    .modal-close-btn {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      border-radius: 13px;
+      corner-shape: squircle;
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-2);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Logs List & Swipe-to-Delete */
+    .log-card-swipe-container {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-md);
+      background: #dc2626;
+      margin-bottom: 10px;
+      user-select: none;
+      touch-action: pan-y;
+    }
+    .log-delete-reveal-btn {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 84px;
+      background: #dc2626;
+      color: #ffffff;
+      border: none;
+      font-size: 12.5px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1;
+    }
+    .log-item-content {
+      background: var(--surface-1);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      corner-shape: squircle;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+      transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.18s ease;
+    }
+    .log-item-content.selected {
+      background: var(--accent-harvest-bg);
+      border-color: var(--accent-harvest);
+    }
+    
+    .log-checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid var(--text-secondary);
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+    .log-item-content.selected .log-checkbox {
+      background: var(--accent-harvest);
+      border-color: var(--accent-harvest);
+    }
+    .log-checkbox svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--ink-dark);
+      stroke-width: 3px;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: opacity 0.15s ease, transform 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .log-item-content.selected .log-checkbox svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    #selectionActionBar {
+      position: fixed;
+      bottom: calc(88px + env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 200;
+      background: var(--surface-1);
+      border: 1px solid var(--border-strong);
+      padding: 8px 12px;
+      border-radius: var(--radius-full);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+      display: flex;
+      gap: 8px;
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    #selectionActionBar.active {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .skeleton-log-card {
+      background: var(--surface-1);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      corner-shape: squircle;
+      padding: 14px 16px;
+      height: 68px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .skeleton-line {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      height: 12px;
+    }
+    [data-theme="light"] .skeleton-line {
+      background: rgba(67, 56, 99, 0.1);
+    }
+
+    /* Command Menu & Shortcut Hints */
+    .kbd-hint {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--border-subtle);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      line-height: 1.2;
+      margin-left: 6px;
+      pointer-events: none;
+    }
+    [data-theme="light"] .kbd-hint {
+      background: rgba(67, 56, 99, 0.08);
+    }
+
+    .cmd-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 290px;
+      overflow-y: auto;
+    }
+    .cmd-item {
+      width: 100%;
+      min-height: 44px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      corner-shape: squircle;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13.5px;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+    }
+    .cmd-item.active,
+    .cmd-item:hover {
+      background: var(--surface-2);
+      border-color: var(--card-peach);
+    }
+    .cmd-item-sub {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-left: 6px;
+    }
+
+    .log-task {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+    }
+    .log-sub {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+    }
+    .log-amt {
+      font-size: 15px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--card-peach);
+      margin-bottom: 4px;
+    }
+
+    .log-status {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: var(--radius-full);
+    }
+    .log-status.paid {
+      background: var(--accent-labour-bg);
+      color: var(--card-peach);
+    }
+    .log-status.advance {
+      background: var(--accent-danger-bg);
+      color: var(--accent-danger);
+    }
+    .log-status.pending {
+      background: var(--accent-harvest-bg);
+      color: var(--accent-harvest);
+    }
+
+    /* Worker Ledger & Avatar Grid */
+    .ledger-card {
+      background: var(--card-peach);
+      color: var(--ink-dark);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+    }
+    .ledger-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .ledger-hero-title {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: rgba(45, 36, 71, 0.7);
+    }
+    .ledger-hero-amount {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--ink-dark);
+    }
+    .ledger-metrics-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .ledger-metric-box {
+      background: rgba(45, 36, 71, 0.08);
+      border-radius: var(--radius-xs);
+      padding: 8px;
+      text-align: center;
+    }
+    .ledger-metric-box span {
+      display: block;
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: rgba(45, 36, 71, 0.65);
+      margin-bottom: 2px;
+    }
+    .ledger-metric-box strong {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--ink-dark);
+    }
+
+    .avatar-grid-15 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      max-height: 150px;
+      overflow-y: auto;
+      padding: 4px;
+    }
+    .avatar-option-cell {
+      aspect-ratio: 1;
+      border-radius: var(--radius-full);
+      border: 2px solid transparent;
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--surface-2);
+    }
+    .avatar-option-cell.selected {
+      border-color: var(--card-peach);
+      transform: scale(1.06);
+    }
+
+    /* Calendar Grid */
+    .cal-weekdays, .cal-days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      text-align: center;
+    }
+    .cal-weekdays span {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--text-secondary);
+      padding: 4px 0;
+    }
+    .cal-day-cell {
+      aspect-ratio: 1;
+      border-radius: 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+    }
+    .cal-day-cell.selected {
+      background: var(--card-peach);
+      color: var(--ink-dark);
+      font-weight: 800;
+    }
+    .cal-dots {
+      display: flex;
+      gap: 3px;
+      margin-top: 2px;
+    }
+    .cal-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+    }
+
+    /* Drawer Nav */
+    .drawer-nav-btn {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      background: var(--surface-2);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-size: 13.5px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 12px;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+
+    /* Undo Toast */
+    .toast-pill {
+      position: fixed;
+      bottom: calc(88px + env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: var(--card-peach);
+      border: 2px solid var(--pill-cream);
+      color: var(--ink-dark);
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+      z-index: 250;
+      opacity: 0;
+      pointer-events: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .toast-pill.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .toast-undo-btn {
+      background: var(--ink-dark);
+      color: var(--pill-cream);
+      border: none;
+      border-radius: var(--radius-full);
+      padding: 5px 12px;
+      min-height: 32px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    
+    /* Invoice Modal & Print CSS */
+    @media print {
+      body * { visibility: hidden; }
+      #invoiceShareModal, #invoiceShareModal * { visibility: visible; }
+      #invoiceShareModal { position: absolute; left: 0; top: 0; width: 100%; height: auto; background: white; color: black; box-shadow: none; display:block;}
+      .modal-close-btn, .print-hide { display: none !important; }
+      .invoice-card { background: white !important; color: black !important; border: none !important; box-shadow: none !important; }
+      .invoice-card * { color: black !important; border-color: #ccc !important; }
+    }
+    
+    .invoice-card {
+       background: var(--surface-1);
+       border: 1px solid var(--border-subtle);
+       border-radius: var(--radius-lg);
+       padding: 20px;
+       color: var(--text-primary);
+    }
+    .invoice-header { display: flex; justify-content: space-between; border-bottom: 2px dashed var(--border-strong); padding-bottom: 16px; margin-bottom: 16px; }
+    .invoice-logo { font-size: 16px; font-weight: 800; color: var(--card-peach); }
+    .invoice-status-pill { padding: 4px 10px; border-radius: 99px; font-size: 10px; font-weight: 800; text-transform: uppercase; background: var(--accent-positive); color: var(--ink-dark); }
+    .invoice-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
+    .invoice-row strong { font-weight: 800; font-family: var(--font-mono); }
+    .invoice-total-box { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; font-size: 16px; font-weight: 800; }
+
+    @media (pointer: coarse) {
+      .icon-action-btn,
+      .strip-mini-btn,
+      .modal-close-btn,
+      .stacked-avatar-item,
+      .stacked-add-btn {
+        min-width: 48px;
+        min-height: 48px;
+      }
+      .segment-btn,
+      .dayoff-toggle-btn,
+      .quick-chip,
+      .balance-pill {
+        min-height: 48px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-viewport">
+    <!-- Minimal Top Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <div class="brand-emblem" id="brandEmblemBtn" onclick="spinEmblemAndSync()" title="Sync Sheet (R)">
+          <svg viewBox="0 0 36 36" fill="none">
+            <circle cx="18" cy="18" r="14" stroke="#2d2447" stroke-width="2" stroke-dasharray="3 2"/>
+            <circle cx="18" cy="18" r="9" fill="#433863"/>
+            <path d="M18 11v14M11 18h14M13 13l10 10M23 13L13 23" stroke="#f3c58b" stroke-width="2.2" stroke-linecap="round"/>
+            <circle cx="18" cy="18" r="3" fill="#f59d8d"/>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <h1>Chelavara Estate</h1>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button type="button" class="sky-toggle-pill" id="themeToggleBtn" onclick="toggleDayNightTheme()" aria-label="Toggle Theme" title="Toggle Theme (T)">
+          <span class="sky-orb"></span>
+        </button>
+
+        <button type="button" class="icon-action-btn" id="cmdMenuTopBtn" onclick="openCommandMenu()" aria-label="Command Menu" title="Command Menu (⌘K / Ctrl+K)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+
+        <button type="button" class="icon-action-btn" id="calendarTopBtn" onclick="openCalendarModal()" aria-label="Calendar" title="Calendar (C)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        </button>
+
+        <button type="button" class="icon-action-btn" id="drawerMenuBtn" onclick="openModal('drawerModal')" aria-label="Logs Explorer" title="Analytics & Logs (M)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Warm Peach-Gold Worker Account Hero Card -->
+    <section class="worker-strip-card" id="workerAccountStripCard">
+      <div class="worker-strip-top">
+        <div class="worker-strip-left">
+          <div class="worker-avatar-badge" id="headerWorkerAvatar" onclick="openWorkerProfileModal()"></div>
+          <div class="worker-strip-details">
+            <span class="worker-strip-title">Labour Account</span>
+            <select class="worker-select-inline" id="activeWorkerSelectDropdown" onchange="selectActiveWorker(this.value)">
+              <option value="Praveen">Praveen</option>
+            </select>
+          </div>
+        </div>
+        <div class="worker-strip-right">
+          <span class="balance-pill" id="workerBalanceBadge" onclick="openWorkerProfileModal()">-₹36,575</span>
+          <button type="button" class="strip-mini-btn" onclick="openWhatsAppModal()" title="Send WhatsApp Statement">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </button>
+          <button type="button" class="strip-mini-btn" onclick="openUpiModal()" title="UPI Payment">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="worker-snapshot-divider"></div>
+
+      <div class="worker-snapshot-grid">
+        <button type="button" class="snapshot-cell" onclick="openWorkerCategoryDrilldown('wage')">
+          <span class="snapshot-cell-label">Work Done</span>
+          <span class="snapshot-cell-val" id="snapEarnedVal">₹33,428</span>
+          <span class="snapshot-cell-sub" id="snapWorkSub">5,102 trees • 3d</span>
+        </button>
+        <button type="button" class="snapshot-cell" onclick="openWorkerCategoryDrilldown('all')">
+          <span class="snapshot-cell-label">Borrowed</span>
+          <span class="snapshot-cell-val" id="snapBorrowedVal">₹70,003</span>
+          <span class="snapshot-cell-sub" id="snapBorrowedSub">18 days off</span>
+        </button>
+        <button type="button" class="snapshot-cell" onclick="openWorkerCategoryDrilldown('alcohol')">
+          <span class="snapshot-cell-label">Alcohol</span>
+          <span class="snapshot-cell-val" id="snapAlcoholVal">₹4,875</span>
+          <span class="snapshot-cell-sub" id="snapAlcoholSub">33 pkts</span>
+        </button>
+        <button type="button" class="snapshot-cell" onclick="openWorkerCategoryDrilldown('grocery')">
+          <span class="snapshot-cell-label">Cash & Groc</span>
+          <span class="snapshot-cell-val" id="snapGrocAdvVal">₹65,128</span>
+          <span class="snapshot-cell-sub">Adv + Groc</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 3-Column KPI Strip -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Labour Outflow</div>
+        <div class="kpi-value" id="kpiLabourVal">₹1,07,431</div>
+        <div class="kpi-sub" id="kpiLabourSub">Wages & Draws</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Harvest Picked</div>
+        <div class="kpi-value" id="kpiHarvestVal">0 kg</div>
+        <div class="kpi-sub" id="kpiHarvestSub">Total Cherry</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Sales Revenue</div>
+        <div class="kpi-value" id="kpiSalesVal">₹5,17,070</div>
+        <div class="kpi-sub" id="kpiSalesSub">1,813 kg Sold</div>
+      </div>
+    </section>
+
+    <!-- Segment Switcher -->
+    <div class="segment-container">
+      <button type="button" class="segment-btn active" id="segBtnForm" onclick="switchViewSegment('form')">
+        <span>Entry Form</span>
+      </button>
+      <button type="button" class="segment-btn" id="segBtnLogs" onclick="switchViewSegment('logs')">
+        <span id="segBtnLogsLabel">Logs (26)</span>
+      </button>
+    </div>
+
+    <!-- Main Entry Form -->
+    <main id="formSection" class="glass-card">
+      <!-- Day Off Mode Banner -->
+      <div class="dayoff-mode-banner" id="dayOffBannerWrap">
+        <div class="dayoff-banner-left">
+          <div>
+            <div class="dayoff-banner-title">Day Off / Absence Logging</div>
+          </div>
+        </div>
+        <button type="button" class="dayoff-toggle-btn" id="dayOffToggleBtn" onclick="toggleDayOffMode()">Enable</button>
+      </div>
+
+      <!-- Date & Estate Block -->
+      <div class="form-row-2">
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="field-label" for="inputDate">Date</label>
+          <input type="date" class="input-box" id="inputDate">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="field-label" for="inputBlock">Estate Block</label>
+          <select class="select-box" id="inputBlock">
+            <option value="Berane">Berane</option>
+            <option value="Pudenkaad">Pudenkaad</option>
+            <option value="Both">Both</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Stacked Worker Avatars (Cream Pill Dock) -->
+      <div class="form-group" id="workerSelectionGroup">
+        <div class="field-label">
+          <span>Worker / Labourer</span>
+          <span class="stacked-active-name-tag" id="stackedActiveWorkerLabel">Praveen</span>
+        </div>
+        <div class="stacked-avatar-wrapper">
+          <div class="stacked-avatars-row" id="workerStackedAvatarsContainer"></div>
+          <button type="button" class="stacked-add-btn" onclick="openModal('addNewWorkerModal')" title="Add Worker">+</button>
+        </div>
+      </div>
+
+      <!-- Buyer Input (Sale Mode Only) -->
+      <div class="form-group" id="salesBuyerGroup" style="display:none;">
+        <label class="field-label" for="inputBuyer">Buyer / Dealer (Vendor)</label>
+        <input type="text" class="input-box" id="inputBuyer" value="Shakeel" placeholder="Buyer name...">
+      </div>
+
+      <!-- Task / Commodity Dropdown -->
+      <div class="form-group">
+        <div class="field-label">
+          <span id="taskFieldLabel">Task</span>
+          <button type="button" class="label-action-btn" id="customTaskBtn" onclick="openModal('customTaskModal')">+ Custom</button>
+        </div>
+        <select class="select-box" id="inputTaskSelect" onchange="handleTaskDropdownChange(this.value)"></select>
+      </div>
+
+      <!-- Dynamic Coffee Out Turn Pricing Card (Sale Mode) -->
+      <div id="coffeePricingCard" style="display:none; background:var(--surface-2); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:12px; margin-bottom:14px;">
+        <div class="field-label" style="margin-bottom:8px;">
+          <span>Coffee Out Turn (OT) Calculator</span>
+          <span id="coffeeBagCostBadge" style="color:var(--card-peach);">1 Bag (50kg): ₹9,938</span>
+        </div>
+        <div class="form-row-2" style="margin-bottom:0;">
+          <div>
+            <label class="field-label">Today's Price (₹)</label>
+            <input type="number" class="input-box" id="inputCoffeeTodayPrice" value="375" oninput="updateCoffeeOutTurnMath()">
+          </div>
+          <div>
+            <label class="field-label">Coffee OT</label>
+            <input type="number" class="input-box" id="inputCoffeeOt" value="26.5" step="0.1" oninput="updateCoffeeOutTurnMath()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Digital Weighing Scale Trigger (Harvest & Sale Only) -->
+      <div class="scale-trigger-bar" id="weighingScaleTrigger" onclick="openModal('weighingScaleModal')">
+        <span>Digital Weighing Scale & Bag Slip</span>
+        <span class="scale-badge" id="scaleTriggerBadge">0.0 kg (0 bags)</span>
+      </div>
+
+      <!-- Units, Wage Basis & Rate -->
+      <div class="form-row-2">
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="field-label" id="unitsFieldLabel" for="inputUnits">Units / Days</label>
+          <input type="number" class="input-box" id="inputUnits" value="1" step="any" oninput="updateLiveFormPreview()">
+        </div>
+        <div class="form-group" id="wageBasisGroup" style="margin-bottom:0;">
+          <label class="field-label" for="inputWageBasis">Wage Basis</label>
+          <select class="select-box" id="inputWageBasis" onchange="handleWageBasisChange(this.value)">
+            <option value="Per Day">Per Day</option>
+            <option value="Per Tree">Per Tree</option>
+            <option value="Per Kg">Per Kg</option>
+            <option value="Fixed Contract">Fixed Contract</option>
+            <option value="Day Off">Day Off</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="field-label" id="rateFieldLabel" for="inputRate">Rate (₹)</label>
+          <input type="number" class="input-box" id="inputRate" value="500" step="any" oninput="updateLiveFormPreview()">
+        </div>
+        <div class="form-group" id="paymentMethodGroup" style="margin-bottom:0;">
+          <label class="field-label" for="inputPaymentMethod">Payment Method</label>
+          <select class="select-box" id="inputPaymentMethod" onchange="currentPaymentMethod = this.value">
+            <option value="Cash">Cash</option>
+            <option value="GPay">GPay</option>
+            <option value="PhonePe">PhonePe</option>
+            <option value="CRED">CRED</option>
+            <option value="Bank Transfer">Bank Transfer</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Draws & Deductions Accordion -->
+      <div class="accordion-box" id="deductionsAccordionWrap">
+        <button type="button" class="accordion-header" onclick="toggleDeductionsAccordion()">
+          <span>Draws & Deductions (Advance, Grocery, Alcohol)</span>
+          <span id="deductionsHeaderSummary">₹0</span>
+        </button>
+        <div class="accordion-body">
+          <div class="form-row-2" style="margin-top:8px;">
+            <div>
+              <label class="field-label" for="inputAdvance">Cash Advance (₹)</label>
+              <input type="number" class="input-box" id="inputAdvance" value="0" oninput="updateLiveFormPreview()">
+            </div>
+            <div>
+              <label class="field-label" for="inputGrocery">Grocery Draw (₹)</label>
+              <input type="number" class="input-box" id="inputGrocery" value="0" oninput="updateLiveFormPreview()">
+            </div>
+          </div>
+          <div class="form-row-2" style="margin-bottom:0;">
+            <div>
+              <label class="field-label" for="inputAlcoholPkts">Alcohol Packets</label>
+              <input type="number" class="input-box" id="inputAlcoholPkts" value="0" oninput="updateLiveFormPreview()">
+            </div>
+            <div>
+              <label class="field-label" for="inputAlcoholRate">Packet Tariff (₹)</label>
+              <input type="number" class="input-box" id="inputAlcoholRate" value="150" oninput="updateLiveFormPreview()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="form-group">
+        <label class="field-label" for="inputNotes">Work Notes</label>
+        <input type="text" class="input-box" id="inputNotes" placeholder="e.g. Branch/sucker pruning, cash draw...">
+      </div>
+
+      <!-- Perforated Receipt Preview -->
+      <div class="form-live-preview">
+        <span id="livePreviewLeftText">Earned: ₹500 • Drawn: ₹0</span>
+        <strong id="livePreviewRightVal">Net: ₹500</strong>
+      </div>
+
+      <button type="button" class="primary-btn" id="mainSubmitBtn" onclick="submitMainEntry()">Save Entry</button>
+    </main>
+
+    <!-- Dynamic Logs Section -->
+    <section id="logsSection" style="display:none;"></section>
+  </div>
+
+  <!-- Bottom Navigation Dock -->
+  <nav class="bottom-dock">
+    <button type="button" class="dock-btn active" id="dockBtnLabour" onclick="switchDockTab('labour')">Labour</button>
+    <button type="button" class="dock-btn" id="dockBtnHarvest" onclick="switchDockTab('harvest')">Harvest</button>
+    <button type="button" class="dock-btn" id="dockBtnSale" onclick="switchDockTab('sale')">Sale</button>
+  </nav>
+  
+  <!-- Selection Action Bar -->
+  <div id="selectionActionBar">
+     <button type="button" class="primary-btn secondary-btn" style="min-height:44px; font-size:13px;" onclick="cancelLogSelection()">Cancel</button>
+     <button type="button" class="primary-btn" style="min-height:44px; font-size:13px;" id="selectionShareBtn" onclick="shareSelectedLogs()">Share (0)</button>
+  </div>
+
+  <!-- Floating Speed-Dial FAB -->
+  <div class="fab-container">
+    <div class="fab-speed-dial" id="fabSpeedDial">
+      <button type="button" class="fab-item" onclick="triggerFabAction('dayoff')">
+        <span class="fab-label">Mark Day Off</span>
+        <span class="fab-sub-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M9 16l2 2 4-4"></path></svg></span>
+      </button>
+      <button type="button" class="fab-item" onclick="triggerFabAction('advance')">
+        <span class="fab-label">Cash Advance</span>
+        <span class="fab-sub-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg></span>
+      </button>
+      <button type="button" class="fab-item" onclick="triggerFabAction('alcohol')">
+        <span class="fab-label">Alcohol Draw</span>
+        <span class="fab-sub-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 22h8"></path><path d="M12 15v7"></path><path d="M12 15a5 5 0 0 0 5-5c0-2-3-7-5-7-2 0-5 5-5 7a5 5 0 0 0 5 5z"></path></svg></span>
+      </button>
+      <button type="button" class="fab-item" onclick="triggerFabAction('maintenance')">
+        <span class="fab-label">Maintenance</span>
+        <span class="fab-sub-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 9.36l-7.1 7.1a2.12 2.12 0 0 1-3-3l7.1-7.1a6 6 0 0 1 9.36-7.94l-3.77 3.77z"></path></svg></span>
+      </button>
+      <button type="button" class="fab-item" onclick="triggerFabAction('profile')">
+        <span class="fab-label">Worker Ledger</span>
+        <span class="fab-sub-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span>
+      </button>
+    </div>
+    <button type="button" class="fab-main-btn" id="fabMainTriggerBtn" onclick="toggleFabMenu()" aria-label="Quick Actions">+</button>
+  </div>
+
+  <!-- 1. Worker Profile & Ledger Modal -->
+  <div class="modal-overlay" id="workerProfileModal" onclick="handleOverlayClick(event, 'workerProfileModal')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2 id="profModalTitle">Praveen's Ledger</h2>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeModal('workerProfileModal')">✕</button>
+      </div>
+
+      <div class="ledger-card">
+        <div class="ledger-top-row">
+          <div>
+            <div class="ledger-hero-title">Outstanding Balance Due</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="ledger-hero-amount" id="profLedgerNetVal">-₹36,575</div>
+            <div style="font-size:10px; font-weight:800;" id="profLedgerStatusSub">Overdrawn by Worker</div>
+          </div>
+        </div>
+        <div class="ledger-metrics-3">
+          <div class="ledger-metric-box">
+            <span>Earned Wage</span>
+            <strong id="profLedgerEarnedVal">₹33,428</strong>
+          </div>
+          <div class="ledger-metric-box">
+            <span>Borrowed</span>
+            <strong id="profLedgerBorrowedVal">-₹70,003</strong>
+          </div>
+          <div class="ledger-metric-box">
+            <span>Balance</span>
+            <strong id="profLedgerBalBoxVal">-₹36,575</strong>
+          </div>
+        </div>
+        <div class="form-row-2" style="margin-bottom:0;">
+          <button type="button" class="primary-btn" style="min-height:42px; background:#1f6f54; color:#fff;" onclick="closeModal('workerProfileModal'); openWhatsAppModal();">WhatsApp</button>
+          <button type="button" class="primary-btn" style="min-height:42px;" onclick="closeModal('workerProfileModal'); openUpiModal();">UPI Pay</button>
+        </div>
+      </div>
+
+      <div class="field-label">
+        <span>Choose Portrait or Upload Photo</span>
+        <label style="color:var(--card-peach); cursor:pointer;">
+          Upload Photo
+          <input type="file" accept="image/*" style="display:none;" onchange="handleProfilePhotoUpload(event)">
+        </label>
+      </div>
+      <div class="avatar-grid-15" id="profAvatarGalleryGrid"></div>
+
+      <div class="form-row-2" style="margin-bottom:0;">
+        <div>
+          <label class="field-label">Phone / WhatsApp</label>
+          <input type="tel" class="input-box" id="profPhoneInput" placeholder="9845123456">
+        </div>
+        <div>
+          <label class="field-label">UPI VPA</label>
+          <input type="text" class="input-box" id="profUpiInput" placeholder="9845123456@hdfcbank">
+        </div>
+      </div>
+      <div class="form-row-2" style="margin-bottom:0;">
+        <div>
+          <label class="field-label">Bank A/C No</label>
+          <input type="text" class="input-box" id="profAccountInput" placeholder="50100345678912">
+        </div>
+        <div>
+          <label class="field-label">IFSC Code</label>
+          <input type="text" class="input-box" id="profIfscInput" placeholder="HDFC0001234">
+        </div>
+      </div>
+
+      <button type="button" class="primary-btn" onclick="saveWorkerProfileDetails()">Save Profile</button>
+    </div>
+  </div>
+
+  <!-- 2. WhatsApp Statement Modal -->
+  <div class="modal-overlay" id="whatsappShareModal" onclick="handleOverlayClick(event, 'whatsappShareModal')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2>Send WhatsApp Statement</h2>
+          <p id="waModalRecipientSub">Recipient: Praveen</p>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeModal('whatsappShareModal')">✕</button>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="field-label">Recipient Contact Number (WhatsApp)</label>
+        <input type="tel" class="input-box" id="waPhoneInput" placeholder="9845123456">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="field-label">Message Content Preview</label>
+        <textarea class="input-box" id="waPreviewTextarea" style="height:150px; font-family:var(--font-mono); font-size:12px; line-height:1.45;" readonly></textarea>
+      </div>
+      <div class="form-row-2" style="margin-bottom:0;">
+        <button type="button" class="primary-btn secondary-btn" onclick="copyTextFromElement('waPreviewTextarea', 'Statement copied')">Copy</button>
+        <button type="button" class="primary-btn" style="background:#1f6f54; color:#fff;" onclick="launchWhatsAppStatement()">Open WhatsApp App</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. UPI Payment Modal -->
+  <div class="modal-overlay" id="upiPayModal" onclick="handleOverlayClick(event, 'upiPayModal')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2 id="upiModalTitle">UPI Payment to Praveen</h2>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeModal('upiPayModal')">✕</button>
+      </div>
+      <div style="background:var(--surface-2); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:12px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-size:9.5px; font-weight:800; color:var(--text-secondary); text-transform:uppercase;">UPI Virtual Payment Address (VPA)</div>
+          <div style="font-size:14px; font-weight:800; font-family:var(--font-mono);" id="upiVpaReadout">9845123456@hdfcbank</div>
+          <div style="font-size:10.5px; color:var(--text-secondary); margin-top:2px;" id="upiBankSubReadout">A/C: 50100345678912 | IFSC: HDFC0001234</div>
+        </div>
+        <button type="button" class="dayoff-toggle-btn" onclick="copyUpiVpa()">Copy</button>
+      </div>
+      <div class="form-row-2" style="margin-bottom:0;">
+        <div>
+          <label class="field-label">Amount to Pay (₹)</label>
+          <input type="number" class="input-box" id="upiAmountInput" value="1000" oninput="updateUpiButtonText()">
+        </div>
+        <div>
+          <label class="field-label">Payment Method</label>
+          <select class="select-box" id="upiModalPaymentMethod">
+            <option value="GPay">GPay</option>
+            <option value="PhonePe">PhonePe</option>
+            <option value="CRED">CRED</option>
+            <option value="Bank Transfer">Bank Transfer</option>
+            <option value="Cash">Cash</option>
+          </select>
+        </div>
+      </div>
+      <div class="quick-chips-row" id="upiPresetChips">
+        <button type="button" class="quick-chip" onclick="selectUpiPreset(500, this)">₹500</button>
+        <button type="button" class="quick-chip active" onclick="selectUpiPreset(1000, this)">₹1000</button>
+        <button type="button" class="quick-chip" onclick="selectUpiPreset(2000, this)">₹2000</button>
+        <button type="button" class="quick-chip" onclick="selectUpiPreset(5000, this)">₹5000</button>
+      </div>
+      <div class="form-row-2" style="margin-bottom:0;">
+        <button type="button" class="primary-btn secondary-btn" style="min-height:42px; font-size:13px;" onclick="launchUpiIntent()">Open UPI App</button>
+        <button type="button" class="primary-btn" id="upiConfirmRecordBtn" style="min-height:42px; font-size:13px;" onclick="executeUpiPaymentAndRecord()">Pay & Record ₹1,000</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Quick Cash Advance Modal -->
+  <div class="modal-overlay" id="quickAdvanceModal" onclick="handleOverlayClick(event, 'quickAdvanceModal')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2>Quick Cash Advance</h2>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeModal('quickAdvanceModal')">✕</button>
+      </div>
+      <div class="form-row-2" style="margin-bottom:0;">
+        <div>
+          <label class="field-label">Worker</label>
+          <select class="select-box" id="quickAdvWorkerSelect"></select>
+        </div>
+        <div>
+          <label class="field-label">Date</label>
+          <input type="date" class="input-box" id="quickAdvDateInput">
+        </div>
+      </div>
+      <div class="form-row-2" style="margin-bottom:0;">
+        <div>
+          <label class="field-label">Amount (₹)</label>
+          <input type="number" class="input-box" id="quickAdvAmountInput" value="1000">
+        </div>
+        <div>
+          <label class="field-label">Payment Method</label>
+          <select class="select-box" id="quickAdvPaymentMethod">
+            <option value="Cash">Cash</option>
+            <option value="GPay">GPay</option>
+            <option value="PhonePe">PhonePe</option>
+            <option value="CRED">CRED</option>
+            <option value="Bank Transfer">Bank Transfer</option>
+          </select>
+        </div>
+      </div>
+      <div class="quick-chips-row" id="quickAdvPresetChips">
+        <button type="button" class="quick-chip" onclick="selectAdvPreset(500, this)">₹500</button>
+        <button type="button" class="quick-chip active" onclick="selectAdvPreset(1000, this)">₹1000</button>
+        <button type="button" class="quick-chip" onclick="selectAdvPreset(2000, this)">₹2000</button>
+        <button type="button" class="quick-chip" onclick="selectAdvPreset(5000, this)">₹5000</button>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="field-label">Notes</label>
+        <input type="text" class="input-box" id="quickAdvNotesInput" placeholder="e.g. Weekly advance draw...">
+      </div>
+      <button type="button" class="primary-btn" onclick="submitQuickAdvance()">Save Cash Advance</button>
+    </div>
+  </div>
+
+  <!-- 5. Quick Alcohol Draw Modal -->
+  <div class="modal-overlay" id="quickAlcoholModal" onclick="handleOverlayClick(event, 'quickAlcoholModal')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2>Alcohol Draw</h2>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeModal('quickAlcoholModal')">✕</button>
+      </div>
+      <div class="form-row-2" style="margin-bottom:0;">
+        <div>
+          <label class="field-label">Worker</label>
+          <select class="select-box" id="quickAlcWorkerSelect"></select>
+        </div>
+        <div>
+          <label class="field-label">Packets Count</label>
+          <input type="number" class="input-box" id="quickAlcPacketsInput" value="1" oninput="updateQuickAlcMath()">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="field-label">Tariff Rate per Packet (₹)</label>
+        <input type="number" class="input-box" id="quickAlcRateInput" value="150" oninput="updateQuickAlcMath()">
+      </div>
+      <div class="quick-chips-row" id="quickAlcRateChips">
+        <button type="button" class="quick-chip" onclick="selectAlcRatePreset(100, this)">₹100</button>
+        <button type="button" class="quick-chip active" onclick="selectAlcRatePreset(150, this)">₹150</button>
+        <button type="button" class="quick-chip" onclick="selectAlcRatePreset(180, this)">₹180</button>
+        <button type="button" class="quick-chip" onclick="selectAlcRatePreset(200, this)">₹200</button>
+      </div>
+      <div class="form-live-preview" style="margin-bottom:0;">
+        <span>Total Alcohol Deduction</span>
+        <strong id="quickAlcTotalReadout">₹150</strong>
+      </div>
+      <button type="button" class="primary-btn" onclick="submitQuickAlcohol()">Save Alcohol Draw</button>
+    </div>
+  </div>
+
+  <!-- 6. Estate Maintenance Modal -->
+  <div class="modal-overlay" id="maintenanceModal" onclick="handleOverlayClick(event, 'maintenanceModal')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2>Estate Maintenance</h2>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeModal('maintenanceModal')">✕</button>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="field-label">Asset / Equipment / System</label>
+        <input type="text" class="input-box" id="maintAssetInput" placeholder="e.g. Pulp House Motor, Main Pipeline...">
+      </div>
+      <div class="form-row-2" style="margin-bottom:0;">
+        <div>
+          <label class="field-label">Estate Block</label>
+          <select class="select-box" id="maintBlockSelect">
+            <option value="Berane">Berane</option>
+            <option value="Pudenkaad">Pudenkaad</option>
+            <option value="Both">Both</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Maintenance Type</label>
+          <select class="select-box" id="maintTypeSelect">
+            <option value="Irrigation & Pipeline">Irrigation & Pipeline</option>
+            <option value="Spraying & Chemicals">Spraying & Chemicals</option>
+            <option value="Machinery & Motor">Machinery & Motor</option>
+            <option value="Electrical & Yard">Electrical & Yard</option>
+            <option value="Fence & Roads">Fence & Roads</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row-2" style="margin-bottom:0;">
+        <div>
+          <label class="field-label">Total Cost (₹)</label>
+          <input type="number" class="input-box" id="maintCostInput" placeholder="1500">
+        </div>
+        <div>
+          <label class="field-label">Technician / Vendor</label>
+          <input type="text" class="input-box" id="maintTechInput" value="Estate Maintenance">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="field-label">Description</label>
+        <input type="text" class="input-box" id="maintDescInput" placeholder="Parts replaced or work done...">
+      </div>
+      <button type="button" class="primary-btn" onclick="submitMaintenanceRecord()">Save Maintenance</button>
+    </div>
+  </div>
+
+  <!-- 7. Digital Weighing Scale Modal -->
+  <div class="modal-overlay" id="weighingScaleModal" onclick="handleOverlayClick(event, 'weighingScaleModal')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2>Digital Weighing Scale</h2>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeModal('weighingScaleModal')">✕</button>
+      </div>
+      <div class="ledger-card" style="text-align:center;">
+        <div class="ledger-hero-title">Cumulative Weight</div>
+        <div class="ledger-hero-amount" id="scaleModalTotalKg">0.0 kg</div>
+        <div style="font-size:11.5px; font-weight:700;" id="scaleModalBagsSub">0 Bags • 0.00 Std Bags (50kg)</div>
+      </div>
+      <div class="quick-chips-row">
+        <button type="button" class="quick-chip" onclick="addScaleBagWeight(50)">+50 kg</button>
+        <button type="button" class="quick-chip" onclick="addScaleBagWeight(52.5)">+52.5 kg</button>
+        <button type="button" class="quick-chip" onclick="addScaleBagWeight(54)">+54 kg</button>
+        <button type="button" class="quick-chip" onclick="addScaleBagWeight(60)">+60 kg</button>
+      </div>
+      <div class="form-row-2" style="margin-bottom:0;">
+        <input type="number" class="input-box" id="scaleManualInput" placeholder="Custom bag kg..." step="any">
+        <button type="button" class="primary-btn" style="min-height:48px;" onclick="addManualScaleBag()">Add Bag</button>
+      </div>
+      <div id="scaleBagsListContainer" style="max-height:120px; overflow-y:auto; font-size:12px; color:var(--text-secondary);"></div>
+      <div class="form-row-2" style="margin-bottom:0;">
+        <button type="button" class="primary-btn secondary-btn" onclick="clearScaleBags()">Clear</button>
+        <button type="button" class="primary-btn" onclick="applyScaleWeightToForm()">Apply Weight</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Operations Calendar Modal -->
+  <div class="modal-overlay" id="calendarModal" onclick="handleOverlayClick(event, 'calendarModal')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2>Operations Calendar</h2>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeModal('calendarModal')">✕</button>
+      </div>
+      <div class="quick-chips-row">
+        <button type="button" class="quick-chip active" onclick="applyDatePeriodFilter('ALL', this)">All Dates</button>
+        <button type="button" class="quick-chip" onclick="applyDatePeriodFilter('2026', this)">Year 2026</button>
+        <button type="button" class="quick-chip" onclick="applyDatePeriodFilter('2025', this)">Year 2025</button>
+        <button type="button" class="quick-chip" onclick="applyDatePeriodFilter('2026-10', this)">Oct 2026</button>
+        <button type="button" class="quick-chip" onclick="applyDatePeriodFilter('2026-09', this)">Sep 2026</button>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <button type="button" class="dayoff-toggle-btn" onclick="shiftCalendarMonth(-1)">Prev</button>
+        <strong id="calMonthYearTitle" style="font-size:14px;">October 2026</strong>
+        <button type="button" class="dayoff-toggle-btn" onclick="shiftCalendarMonth(1)">Next</button>
+      </div>
+      <div class="cal-weekdays">
+        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+      </div>
+      <div class="cal-days-grid" id="calendarGridContainer"></div>
+      <div class="form-row-2" style="margin-bottom:0;">
+        <button type="button" class="primary-btn secondary-btn" style="min-height:44px; font-size:12.5px;" onclick="calendarJumpToForm(false)">Log Shift on Date</button>
+        <button type="button" class="primary-btn danger-btn" style="min-height:44px; font-size:12.5px;" onclick="calendarJumpToForm(true)">Mark Day Off</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. Hamburger Analytics & Category Explorer Drawer -->
+  <div class="modal-overlay" id="drawerModal" onclick="handleOverlayClick(event, 'drawerModal')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2>Category Logs & Analytics</h2>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeModal('drawerModal')">✕</button>
+      </div>
+      <div>
+        <button type="button" class="drawer-nav-btn" onclick="openHamburgerLogCategory('all')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <span>Complete Worker Summary</span>
+        </button>
+        <button type="button" class="drawer-nav-btn" onclick="openHamburgerLogCategory('alcohol')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 22h8"></path><path d="M12 15v7"></path><path d="M12 15a5 5 0 0 0 5-5c0-2-3-7-5-7-2 0-5 5-5 7a5 5 0 0 0 5 5z"></path></svg>
+          <span>Alcohol Logs</span>
+        </button>
+        <button type="button" class="drawer-nav-btn" onclick="openHamburgerLogCategory('grocery')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg>
+          <span>Grocery & Advance Logs</span>
+        </button>
+        <button type="button" class="drawer-nav-btn" onclick="openHamburgerLogCategory('wage')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+          <span>Wage Logs</span>
+        </button>
+        <button type="button" class="drawer-nav-btn" onclick="openHamburgerLogCategory('maintenance')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 9.36l-7.1 7.1a2.12 2.12 0 0 1-3-3l7.1-7.1a6 6 0 0 1 9.36-7.94l-3.77 3.77z"></path></svg>
+          <span>Maintenance Logs</span>
+        </button>
+        <button type="button" class="drawer-nav-btn" onclick="openHamburgerLogCategory('estate')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          <span>Estate Logs (Total Trees & All)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. Dedicated Minimalist Category Logs Window -->
+  <div class="modal-overlay" id="categoryLogsModal" onclick="handleOverlayClick(event, 'categoryLogsModal')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2 id="catWindowTitle">Category Summary</h2>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeModal('categoryLogsModal')">✕</button>
+      </div>
+      <div class="form-row-2" style="margin-bottom:0;">
+        <div>
+          <label class="field-label">Category</label>
+          <select class="select-box" id="catWinCategorySelect" onchange="renderCategoryWindow()">
+            <option value="all">Complete Summary</option>
+            <option value="alcohol">Alcohol Logs</option>
+            <option value="grocery">Grocery & Advances</option>
+            <option value="wage">Wage Logs</option>
+            <option value="maintenance">Maintenance Logs</option>
+            <option value="estate">Estate Logs (Trees & All)</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Worker</label>
+          <select class="select-box" id="catWinWorkerSelect" onchange="renderCategoryWindow()"></select>
+        </div>
+      </div>
+      <div class="form-row-2" style="margin-bottom:0;">
+        <div>
+          <label class="field-label">Estate Block</label>
+          <select class="select-box" id="catWinBlockSelect" onchange="renderCategoryWindow()">
+            <option value="ALL">All Blocks</option>
+            <option value="Berane">Berane</option>
+            <option value="Pudenkaad">Pudenkaad</option>
+            <option value="Both">Both</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Period</label>
+          <select class="select-box" id="catWinPeriodSelect" onchange="renderCategoryWindow()">
+            <option value="ALL">All Time</option>
+            <option value="2026">Year 2026</option>
+            <option value="2025">Year 2025</option>
+            <option value="2026-10">Oct 2026</option>
+            <option value="2026-09">Sep 2026</option>
+          </select>
+        </div>
+      </div>
+      <div class="ledger-card" style="padding:12px;">
+        <div class="ledger-metrics-3" id="catWinSummaryBoxes" style="margin-bottom:0;"></div>
+      </div>
+      <div id="catWinLogsContainer" style="max-height:260px; overflow-y:auto;"></div>
+    </div>
+  </div>
+
+  <!-- 11. Add New Worker Modal -->
+  <div class="modal-overlay" id="addNewWorkerModal" onclick="handleOverlayClick(event, 'addNewWorkerModal')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2>Add New Worker</h2>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeModal('addNewWorkerModal')">✕</button>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="field-label">Worker Name</label>
+        <input type="text" class="input-box" id="newWorkerNameInput" placeholder="Enter worker name...">
+      </div>
+      <div class="form-row-2" style="margin-bottom:0;">
+        <div>
+          <label class="field-label">Phone (Optional)</label>
+          <input type="tel" class="input-box" id="newWorkerPhoneInput" placeholder="9845123456">
+        </div>
+        <div>
+          <label class="field-label">UPI VPA (Optional)</label>
+          <input type="text" class="input-box" id="newWorkerUpiInput" placeholder="name@upi">
+        </div>
+      </div>
+      <button type="button" class="primary-btn" onclick="saveNewWorkerAction()">Add Worker</button>
+    </div>
+  </div>
+
+  <!-- 12. Add Custom Task Modal -->
+  <div class="modal-overlay" id="customTaskModal" onclick="handleOverlayClick(event, 'customTaskModal')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2>Add Custom Task / Item</h2>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeModal('customTaskModal')">✕</button>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="field-label">Task or Produce Name</label>
+        <input type="text" class="input-box" id="customTaskNameInput" placeholder="Enter custom name...">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="field-label">Default Rate (₹)</label>
+        <input type="number" class="input-box" id="customTaskRateInput" value="500">
+      </div>
+      <button type="button" class="primary-btn" onclick="saveCustomTaskAction()">Apply Custom Task</button>
+    </div>
+  </div>
+
+  <!-- 13. Command Menu Modal (Cmd+K / Ctrl+K) -->
+  <div class="modal-overlay" id="commandMenuModal" onclick="handleOverlayClick(event, 'commandMenuModal')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2>Command Menu</h2>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeModal('commandMenuModal')">✕</button>
+      </div>
+      <div class="form-group" style="margin-bottom:4px;">
+        <input type="text" class="input-box" id="cmdSearchInput" placeholder="Type a command, page, or worker..." autocomplete="off" oninput="filterCommandMenu(this.value)">
+      </div>
+      <div class="cmd-list" id="cmdMenuResults"></div>
+    </div>
+  </div>
+  
+  <!-- 14. Log Invoice / Receipt Share Modal -->
+  <div class="modal-overlay" id="invoiceShareModal" onclick="handleOverlayClick(event, 'invoiceShareModal')">
+    <div class="modal-sheet" style="padding: 16px;">
+      <button type="button" class="modal-close-btn print-hide" onclick="closeModal('invoiceShareModal')" style="position:absolute; right:16px; top:16px; width:36px; height:36px; min-width:36px; min-height:36px; font-size:12px; z-index:10;">✕</button>
+      <div class="invoice-card" id="invoiceCardContent">
+         <!-- Content injected via JS -->
+      </div>
+      <div class="form-row-2 print-hide" style="margin-top: 12px; margin-bottom:0;">
+        <button type="button" class="primary-btn secondary-btn" onclick="window.print()">Print / PDF</button>
+        <button type="button" class="primary-btn" onclick="shareInvoiceData()">Share Receipt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Undo Toast -->
+  <div class="toast-pill" id="appToast" role="status" aria-live="polite">
+    <span id="appToastText">Saved</span>
+    <button type="button" class="toast-undo-btn" id="appToastUndoBtn" style="display:none;" onclick="undoLastSoftDelete()">Undo</button>
+  </div>
+
+  <script>
+    var WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyJBAE2kKy3-g8fsJ0TOLsP6uZz7IvjWmUkLLT1w0kSTKTcfxAIPK9_xGQEJp2nlykRiw/exec';
+
+    var safeStorage = {
+      getItem: function(key) {
+        try { return window.localStorage.getItem(key); } catch (e) { return null; }
+      },
+      setItem: function(key, val) {
+        try { window.localStorage.setItem(key, val); } catch (e) {}
+      }
+    };
+
+    var INITIAL_SHEET_ROWS = [
+      { rowIndex_: 2, row: ['2026-09-01', 2026, 'Both', 'Pruning', 'Praveen', 1, 'Day Off', 0, 0, 5000, 0, 0, -5000, 'Advance Paid', 'Branch/sucker pruning', '2026-09-01', 5000, 'Cash'] },
+      { rowIndex_: 3, row: ['2026-09-02', 2026, 'Both', 'Pruning', 'Praveen', 1, 'Day Off', 0, 0, 1000, 0, 0, -1000, 'Advance Paid', 'Branch/sucker pruning', '2026-09-02', 1000, 'Cash'] },
+      { rowIndex_: 4, row: ['2026-09-08', 2026, 'Both', 'Pruning', 'Praveen', 1, 'Day Off', 0, 0, 0, 7500, 0, -7500, 'Advance Paid', 'Branch/sucker pruning', '2026-09-08', 7500, 'Cash'] },
+      { rowIndex_: 5, row: ['2026-09-14', 2026, 'Both', 'Pruning', 'Praveen', 1, 'Day Off', 0, 0, 10000, 0, 0, -10000, 'Advance Paid', 'Branch/sucker pruning', '2026-09-14', 10000, 'Cash'] },
+      { rowIndex_: 14, row: ['2026-09-14', 2026, 'Berane', 'Pruning', 'Praveen', 2957, 'Per Tree', 4, 11828, 0, 0, 0, 11828, 'Paid', 'Chigr', '2026-09-18', 0, 'Cash'] }
+    ];
+
+    var sheetRows = INITIAL_SHEET_ROWS.slice();
+    var workerProfiles = {
+      Praveen: {
+        name: 'Praveen',
+        phone: '9845123456',
+        upi: '9845123456@hdfcbank',
+        account: '50100345678912',
+        ifsc: 'HDFC0001234',
+        avatarIdx: 0,
+        avatarDataUrl: ''
+      }
+    };
+
+    var currentActiveWorker = 'Praveen';
+    var currentActiveDockTab = 'labour';
+    var currentActiveSegment = 'form';
+    var currentDateFilter = 'ALL';
+    var currentSpecialLogFilter = 'ALL';
+    var currentSpecialWorkerFilter = 'ALL';
+    var currentPaymentMethod = 'Cash';
+    var isDayOffMode = false;
+    var scaleBags = [];
+    var isSubmitting = false;
+    var calendarMonth = 9;
+    var calendarYear = 2026;
+    var selectedCalendarDate = '2026-10-27';
+    
+    // Selection state variables
+    var isSelectionMode = false;
+    var selectedLogIds = [];
+
+    var isMacPlatform = /Mac|iPhone|iPad|iPod/i.test((navigator.platform || '') + ' ' + (navigator.userAgent || ''));
+    var modKeySymbol = isMacPlatform ? '⌘' : 'Ctrl+';
+    var showLogsSkeleton = false;
+    var skeletonTimer = null;
+    var pendingSoftDelete = null;
+    var pendingActionIdempotencyKey = null;
+    var cmdSelectedIndex = 0;
+    var cmdFilteredItems = [];
+
+    var TASK_CATALOG = {
+      labour: [
+        { label: 'Pruning (₹500 Per Day)', task: 'Pruning', rate: 500, basis: 'Per Day' },
+        { label: 'Tree Pruning (₹4 Per Tree)', task: 'Pruning', rate: 4, basis: 'Per Tree' },
+        { label: 'Weeding (₹450 Per Day)', task: 'Weeding', rate: 450, basis: 'Per Day' },
+        { label: 'Manuring & Fertilizer (₹500 Per Day)', task: 'Manuring & Fertilizing', rate: 500, basis: 'Per Day' },
+        { label: 'Spraying / Chemical (₹600 Per Day)', task: 'Spraying / Chemical', rate: 600, basis: 'Per Day' },
+        { label: 'Shade Regulation (₹550 Per Day)', task: 'Shade Regulation', rate: 550, basis: 'Per Day' },
+        { label: 'Day Off / Absence (₹0)', task: 'Day Off', rate: 0, basis: 'Day Off' }
+      ],
+      harvest: [
+        { label: 'Robusta Coffee Picking (₹5/kg)', task: 'Harvest: Robusta Picking', rate: 5, basis: 'Per Kg' },
+        { label: 'Arabica Coffee Picking (₹6/kg)', task: 'Harvest: Arabica Picking', rate: 6, basis: 'Per Kg' },
+        { label: 'Black Pepper Picking (₹12/kg)', task: 'Harvest: Black Pepper Picking', rate: 12, basis: 'Per Kg' },
+        { label: 'Pulping & Processing (₹500/day)', task: 'Harvest: Pulping & Processing', rate: 500, basis: 'Per Day' },
+        { label: 'Drying Yard Turning (₹450/day)', task: 'Harvest: Drying Yard', rate: 450, basis: 'Per Day' }
+      ],
+      sale: [
+        { label: 'Robusta Coffee (OT Pricing)', task: 'Sales: Robusta Coffee', rate: 198.75, basis: 'Per Kg' },
+        { label: 'Arabica Coffee (OT Pricing)', task: 'Sales: Arabica Coffee', rate: 240, basis: 'Per Kg' },
+        { label: 'Black Pepper (₹700/kg)', task: 'Sales: Black Pepper', rate: 700, basis: 'Per Kg' },
+        { label: 'Green Cardamom (₹1,800/kg)', task: 'Sales: Green Cardamom', rate: 1800, basis: 'Per Kg' },
+        { label: 'Arecanut (₹420/kg)', task: 'Sales: Arecanut', rate: 420, basis: 'Per Kg' }
+      ]
+    };
+
+    var AVATAR_COLORS = [
+      ['#f3c58b', '#2d2447'], ['#f59d8d', '#2d2447'], ['#b497f8', '#2d2447'],
+      ['#6ee7b7', '#2d2447'], ['#7dd3fc', '#2d2447'], ['#fde047', '#2d2447'],
+      ['#f9a8d4', '#2d2447'], ['#fdba74', '#2d2447'], ['#a5b4fc', '#2d2447'],
+      ['#86efac', '#2d2447'], ['#fca5a5', '#2d2447'], ['#cbd5e1', '#2d2447'],
+      ['#d8b4fe', '#2d2447'], ['#99f6e4', '#2d2447'], ['#fed7aa', '#2d2447']
+    ];
+
+    function generateAvatarSvg(name, overrideIdx) {
+      var str = String(name || '').trim().toUpperCase();
+      var parts = str.split(' ');
+      var initials = parts.length > 1 ? parts[0][0] + parts[1][0] : (str.substring(0, 2) || '?');
+      var colorIdx = 0;
+      if (typeof overrideIdx === 'number') {
+        colorIdx = Math.abs(overrideIdx) % AVATAR_COLORS.length;
+      } else {
+        var hash = 0;
+        for (var i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        colorIdx = Math.abs(hash) % AVATAR_COLORS.length;
+      }
+      var pair = AVATAR_COLORS[colorIdx] || AVATAR_COLORS[0];
+      var bg = pair[0];
+      var fg = pair[1];
+      return '<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+        '<rect width="48" height="48" rx="24" fill="' + bg + '"/>' +
+        '<text x="24" y="25" dominant-baseline="middle" text-anchor="middle" fill="' + fg + '" font-family="var(--font-sans)" font-weight="800" font-size="20">' + initials + '</text>' +
+      '</svg>';
+    }
+
+    function prefersReducedMotion() {
+      return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+
+    function runViewTransition(updateFn) {
+      if (document.startViewTransition && !prefersReducedMotion()) {
+        try {
+          document.startViewTransition(function() { updateFn(); });
+          return;
+        } catch (e) {}
+      }
+      updateFn();
+    }
+
+    function generateIdempotencyKey() {
+      if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+        return window.crypto.randomUUID();
+      }
+      return 'idem-' + Date.now() + '-' + Math.random().toString(36).slice(2, 11);
+    }
+
+    function getFormattedCurrentDate() {
+      var d = new Date();
+      var y = d.getFullYear();
+      var m = String(d.getMonth() + 1).padStart(2, '0');
+      var day = String(d.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + day;
+    }
+
+    function formatINR(val) {
+      var num = Math.round(parseFloat(val) || 0);
+      var sign = num < 0 ? '-' : '';
+      return sign + '₹' + Math.abs(num).toLocaleString('en-IN');
+    }
+
+    function getRowData(item) {
+      if (!item) return [];
+      return Array.isArray(item.row) ? item.row : (Array.isArray(item) ? item : []);
+    }
+
+    function getRowCategory(row) {
+      var task = String(row[3] || '').toLowerCase();
+      var basis = String(row[6] || '').toLowerCase();
+      if (task.indexOf('sales:') === 0 || task.indexOf('sale:') === 0) return 'sale';
+      if (task.indexOf('harvest:') === 0 || task.indexOf('picking') !== -1) return 'harvest';
+      if (task.indexOf('maintenance') === 0 || basis === 'maintenance') return 'maintenance';
+      return 'labour';
+    }
+
+    function openModal(id) {
+      var el = document.getElementById(id);
+      if (el) {
+        var sheet = el.querySelector('.modal-sheet');
+        if (sheet) {
+          sheet.style.transform = '';
+          sheet.style.opacity = '';
+        }
+        el.classList.add('open');
+      }
+    }
+
+    function closeModal(id) {
+      var el = document.getElementById(id);
+      if (el) el.classList.remove('open');
+    }
+
+    function handleOverlayClick(e, id) {
+      if (e && e.target && e.target.id === id) {
+        closeModal(id);
+      }
+    }
+
+    var toastTimer = null;
+    function showToast(msg, undoCallback) {
+      var toast = document.getElementById('appToast');
+      var textEl = document.getElementById('appToastText');
+      var undoBtn = document.getElementById('appToastUndoBtn');
+      if (!toast) return;
+      if (textEl) textEl.textContent = msg;
+      if (undoBtn) {
+        undoBtn.style.display = typeof undoCallback === 'function' ? 'inline-flex' : 'none';
+      }
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      var duration = typeof undoCallback === 'function' ? 7000 : 2400;
+      toastTimer = setTimeout(function() {
+        toast.classList.remove('show');
+        if (undoBtn) undoBtn.style.display = 'none';
+      }, duration);
+    }
+
+    function toggleDayNightTheme() {
+      runViewTransition(function() {
+        var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+        document.documentElement.setAttribute('data-theme', isLight ? 'dark' : 'light');
+      });
+    }
+
+    function spinEmblemAndSync() {
+      var emblem = document.getElementById('brandEmblemBtn');
+      if (emblem) {
+        emblem.classList.add('spinning');
+        setTimeout(function() { emblem.classList.remove('spinning'); }, 650);
+      }
+      fetchRemoteSheetData(false);
+      showToast('Syncing Google Sheet');
+    }
+
+    function switchViewSegment(segment) {
+      runViewTransition(function() {
+        currentActiveSegment = segment;
+        var btnForm = document.getElementById('segBtnForm');
+        var btnLogs = document.getElementById('segBtnLogs');
+        var secForm = document.getElementById('formSection');
+        var secLogs = document.getElementById('logsSection');
+
+        if (btnForm) btnForm.classList.toggle('active', segment === 'form');
+        if (btnLogs) btnLogs.classList.toggle('active', segment === 'logs');
+        if (secForm) secForm.style.display = segment === 'form' ? 'block' : 'none';
+        if (secLogs) secLogs.style.display = segment === 'logs' ? 'block' : 'none';
+
+        if (segment === 'logs') renderLogsList();
+      });
+    }
+
+    function getWorkerList() {
+      var names = {};
+      var pKeys = Object.keys(workerProfiles);
+      for (var i = 0; i < pKeys.length; i++) {
+        names[pKeys[i]] = true;
+      }
+      for (var j = 0; j < sheetRows.length; j++) {
+        var r = getRowData(sheetRows[j]);
+        var cat = getRowCategory(r);
+        var w = String(r[4] || '').trim();
+        if (cat === 'labour' && w && w !== 'Estate Maintenance' && w !== 'Shakeel') {
+          names[w] = true;
+        }
+      }
+      var list = Object.keys(names);
+      if (list.length === 0) list = ['Praveen'];
+      return list;
+    }
+
+    function populateWorkerSelectors() {
+      var list = getWorkerList();
+      if (list.indexOf(currentActiveWorker) === -1) {
+        currentActiveWorker = list[0];
+      }
+
+      var stripSelect = document.getElementById('activeWorkerSelectDropdown');
+      if (stripSelect) {
+        stripSelect.innerHTML = list.map(function(w) {
+          return '<option value="' + w + '" ' + (w === currentActiveWorker ? 'selected' : '') + '>' + w + '</option>';
+        }).join('');
+      }
+
+      var activeTag = document.getElementById('stackedActiveWorkerLabel');
+      if (activeTag) activeTag.textContent = currentActiveWorker;
+
+      var prof = workerProfiles[currentActiveWorker] || {};
+      var headerAv = document.getElementById('headerWorkerAvatar');
+      if (headerAv) {
+        headerAv.innerHTML = prof.avatarDataUrl
+          ? '<img src="' + prof.avatarDataUrl + '" alt="' + currentActiveWorker + '">'
+          : generateAvatarSvg(currentActiveWorker, prof.avatarIdx);
+      }
+
+      var stackedContainer = document.getElementById('workerStackedAvatarsContainer');
+      if (stackedContainer) {
+        stackedContainer.innerHTML = list.map(function(w, idx) {
+          var isAct = (w === currentActiveWorker);
+          var p = workerProfiles[w] || {};
+          var content = p.avatarDataUrl
+            ? '<img src="' + p.avatarDataUrl + '" alt="' + w + '">'
+            : generateAvatarSvg(w, p.avatarIdx);
+          var z = isAct ? 45 : (10 + idx);
+          return '<button type="button" class="stacked-avatar-item ' + (isAct ? 'active' : '') + '" style="z-index:' + z + ';" onclick="selectActiveWorker(\'' + w.replace(/'/g, "\\'") + '\')" title="' + w + '">' + content + '</button>';
+        }).join('');
+      }
+
+      var modalOpts = list.map(function(w) {
+        return '<option value="' + w + '" ' + (w === currentActiveWorker ? 'selected' : '') + '>' + w + '</option>';
+      }).join('');
+      var advSel = document.getElementById('quickAdvWorkerSelect');
+      var alcSel = document.getElementById('quickAlcWorkerSelect');
+      if (advSel) advSel.innerHTML = modalOpts;
+      if (alcSel) alcSel.innerHTML = modalOpts;
+
+      var catWorkerSel = document.getElementById('catWinWorkerSelect');
+      if (catWorkerSel) {
+        catWorkerSel.innerHTML = '<option value="ALL">All Workers</option>' + list.map(function(w) {
+          return '<option value="' + w + '">' + w + '</option>';
+        }).join('');
+      }
+
+      updateWorkerStripBalance();
+    }
+
+    function selectActiveWorker(name) {
+      if (!name) return;
+      runViewTransition(function() {
+        currentActiveWorker = name;
+        if (currentSpecialLogFilter !== 'ALL' && currentSpecialLogFilter !== 'maintenance') {
+          currentSpecialWorkerFilter = name;
+        }
+        populateWorkerSelectors();
+        if (isDayOffMode && currentActiveDockTab === 'labour') {
+          var submitBtn = document.getElementById('mainSubmitBtn');
+          if (submitBtn) submitBtn.textContent = 'Save Day Off (' + currentActiveWorker + ')';
+        }
+        updateSegmentLabels();
+        renderLogsList();
+      });
+    }
+
+    function computeWorkerLedger(workerName) {
+      var earned = 0;
+      var adv = 0;
+      var groc = 0;
+      var alc = 0;
+      var trees = 0;
+      var workDays = 0;
+      var daysOff = 0;
+
+      for (var i = 0; i < sheetRows.length; i++) {
+        var r = getRowData(sheetRows[i]);
+        var w = String(r[4] || '').trim();
+        if (w.toLowerCase() === String(workerName || '').toLowerCase()) {
+          var units = parseFloat(r[5]) || 0;
+          var basis = String(r[6] || '');
+          var cost = parseFloat(r[8]) || 0;
+          var a = parseFloat(r[9]) || 0;
+          var g = parseFloat(r[10]) || 0;
+          var al = parseFloat(r[11]) || 0;
+
+          earned += cost;
+          adv += a;
+          groc += g;
+          alc += al;
+
+          if (basis === 'Per Tree') {
+            trees += units;
+            workDays += 1;
+          } else if (basis === 'Day Off' || String(r[3] || '') === 'Day Off') {
+            daysOff += 1;
+          } else if (cost > 0) {
+            workDays += units;
+          }
+        }
+      }
+      var borrowed = adv + groc + alc;
+      var net = earned - borrowed;
+      return {
+        earned: earned,
+        adv: adv,
+        groc: groc,
+        alc: alc,
+        borrowed: borrowed,
+        net: net,
+        trees: trees,
+        workDays: workDays,
+        daysOff: daysOff
+      };
+    }
+
+    function updateWorkerStripBalance() {
+      var stats = computeWorkerLedger(currentActiveWorker);
+      var badge = document.getElementById('workerBalanceBadge');
+      if (badge) {
+        badge.textContent = formatINR(stats.net);
+        badge.classList.toggle('positive', stats.net >= 0);
+      }
+
+      var snapEarned = document.getElementById('snapEarnedVal');
+      var snapWorkSub = document.getElementById('snapWorkSub');
+      var snapBorrowed = document.getElementById('snapBorrowedVal');
+      var snapBorrowedSub = document.getElementById('snapBorrowedSub');
+      var snapAlcohol = document.getElementById('snapAlcoholVal');
+      var snapAlcoholSub = document.getElementById('snapAlcoholSub');
+      var snapGrocAdv = document.getElementById('snapGrocAdvVal');
+
+      if (snapEarned) snapEarned.textContent = formatINR(stats.earned);
+      if (snapWorkSub) snapWorkSub.textContent = stats.trees.toLocaleString('en-IN') + ' trees • ' + stats.workDays + 'd';
+      if (snapBorrowed) snapBorrowed.textContent = formatINR(stats.borrowed);
+      if (snapBorrowedSub) snapBorrowedSub.textContent = stats.daysOff + ' days off';
+      if (snapAlcohol) snapAlcohol.textContent = formatINR(stats.alc);
+      if (snapAlcoholSub) snapAlcoholSub.textContent = Math.round(stats.alc / 150) + ' pkts';
+      if (snapGrocAdv) snapGrocAdv.textContent = formatINR(stats.adv + stats.groc);
+    }
+
+    function recalculateAggregates() {
+      var labourOut = 0;
+      var harvestKg = 0;
+      var salesRev = 0;
+      var salesKg = 0;
+
+      for (var i = 0; i < sheetRows.length; i++) {
+        var r = getRowData(sheetRows[i]);
+        var cat = getRowCategory(r);
+        var units = parseFloat(r[5]) || 0;
+        var cost = parseFloat(r[8]) || 0;
+        var adv = parseFloat(r[9]) || 0;
+        var groc = parseFloat(r[10]) || 0;
+        var alc = parseFloat(r[11]) || 0;
+
+        if (cat === 'sale') {
+          salesRev += cost;
+          salesKg += units;
+        } else if (cat === 'harvest') {
+          harvestKg += units;
+          labourOut += (cost + adv + groc + alc);
+        } else {
+          labourOut += (cost + adv + groc + alc);
+        }
+      }
+
+      var kLab = document.getElementById('kpiLabourVal');
+      var kHar = document.getElementById('kpiHarvestVal');
+      var kSal = document.getElementById('kpiSalesVal');
+      var kSalSub = document.getElementById('kpiSalesSub');
+
+      if (kLab) kLab.textContent = formatINR(labourOut);
+      if (kHar) kHar.textContent = Math.round(harvestKg).toLocaleString('en-IN') + ' kg';
+      if (kSal) kSal.textContent = formatINR(salesRev);
+      if (kSalSub) kSalSub.textContent = Math.round(salesKg).toLocaleString('en-IN') + ' kg Sold';
+    }
+
+    function populateTaskDropdown() {
+      var select = document.getElementById('inputTaskSelect');
+      if (!select) return;
+      var items = TASK_CATALOG[currentActiveDockTab] || TASK_CATALOG.labour;
+      select.innerHTML = items.map(function(item) {
+        var val = item.task + '|' + item.rate + '|' + item.basis;
+        return '<option value="' + val + '">' + item.label + '</option>';
+      }).join('');
+      if (items.length > 0) {
+        handleTaskDropdownChange(select.value);
+      }
+    }
+
+    function handleTaskDropdownChange(val) {
+      if (!val) return;
+      var parts = String(val).split('|');
+      var taskName = parts[0] || '';
+      var rate = parseFloat(parts[1]);
+      var basis = parts[2] || 'Per Day';
+
+      var rateEl = document.getElementById('inputRate');
+      var basisEl = document.getElementById('inputWageBasis');
+      if (!isNaN(rate) && rateEl) rateEl.value = rate;
+      if (basisEl && currentActiveDockTab !== 'sale') basisEl.value = basis;
+
+      var coffeeCard = document.getElementById('coffeePricingCard');
+      if (coffeeCard) {
+        var isCoffeeSale = (currentActiveDockTab === 'sale' && taskName.toLowerCase().indexOf('coffee') !== -1);
+        coffeeCard.style.display = isCoffeeSale ? 'block' : 'none';
+        if (isCoffeeSale) updateCoffeeOutTurnMath();
+      }
+
+      if (taskName === 'Day Off' || basis === 'Day Off') {
+        setDayOffMode(true);
+      } else if (isDayOffMode) {
+        setDayOffMode(false);
+      }
+      updateLiveFormPreview();
+    }
+
+    function updateCoffeeOutTurnMath() {
+      var priceEl = document.getElementById('inputCoffeeTodayPrice');
+      var otEl = document.getElementById('inputCoffeeOt');
+      var rateEl = document.getElementById('inputRate');
+      var badgeEl = document.getElementById('coffeeBagCostBadge');
+
+      var todayPrice = parseFloat(priceEl ? priceEl.value : 375) || 0;
+      var ot = parseFloat(otEl ? otEl.value : 26.5) || 0;
+      var bagCost = ot * todayPrice;
+      var perKg = bagCost / 50;
+
+      if (badgeEl) badgeEl.textContent = '1 Bag (50kg): ' + formatINR(bagCost);
+      if (rateEl) rateEl.value = perKg.toFixed(2);
+      updateLiveFormPreview();
+    }
+
+    function handleWageBasisChange(basis) {
+      if (basis === 'Day Off') {
+        setDayOffMode(true);
+      } else if (isDayOffMode) {
+        setDayOffMode(false);
+      }
+      updateLiveFormPreview();
+    }
+
+    function toggleDayOffMode() {
+      setDayOffMode(!isDayOffMode);
+    }
+
+    function setDayOffMode(active) {
+      isDayOffMode = Boolean(active);
+      var banner = document.getElementById('dayOffBannerWrap');
+      var btn = document.getElementById('dayOffToggleBtn');
+      var uEl = document.getElementById('inputUnits');
+      var rEl = document.getElementById('inputRate');
+      var bEl = document.getElementById('inputWageBasis');
+      var acc = document.getElementById('deductionsAccordionWrap');
+      var submitBtn = document.getElementById('mainSubmitBtn');
+
+      if (banner) banner.classList.toggle('active', isDayOffMode);
+      if (btn) btn.textContent = isDayOffMode ? 'Active' : 'Enable';
+
+      if (isDayOffMode) {
+        if (uEl) { uEl.value = 1; uEl.disabled = true; }
+        if (rEl) { rEl.value = 0; rEl.disabled = true; }
+        if (bEl) bEl.value = 'Day Off';
+        if (acc) acc.classList.add('open');
+        if (submitBtn && currentActiveDockTab === 'labour') {
+          submitBtn.textContent = 'Save Day Off (' + currentActiveWorker + ')';
+        }
+      } else {
+        if (uEl) uEl.disabled = false;
+        if (rEl) {
+          rEl.disabled = false;
+          if (parseFloat(rEl.value) === 0) rEl.value = 500;
+        }
+        if (bEl && bEl.value === 'Day Off') bEl.value = 'Per Day';
+        if (submitBtn && currentActiveDockTab === 'labour') {
+          submitBtn.textContent = 'Save Entry';
+        }
+      }
+      updateLiveFormPreview();
+    }
+
+    function toggleDeductionsAccordion() {
+      var acc = document.getElementById('deductionsAccordionWrap');
+      if (acc) acc.classList.toggle('open');
+    }
+
+    function updateLiveFormPreview() {
+      var uEl = document.getElementById('inputUnits');
+      var rEl = document.getElementById('inputRate');
+      var advEl = document.getElementById('inputAdvance');
+      var grocEl = document.getElementById('inputGrocery');
+      var pktsEl = document.getElementById('inputAlcoholPkts');
+      var alcRateEl = document.getElementById('inputAlcoholRate');
+
+      var units = isDayOffMode ? 1 : (parseFloat(uEl ? uEl.value : 0) || 0);
+      var rate = isDayOffMode ? 0 : (parseFloat(rEl ? rEl.value : 0) || 0);
+      var totalCost = isDayOffMode ? 0 : (units * rate);
+
+      var leftEl = document.getElementById('livePreviewLeftText');
+      var rightEl = document.getElementById('livePreviewRightVal');
+      var dedHeader = document.getElementById('deductionsHeaderSummary');
+
+      if (currentActiveDockTab === 'sale') {
+        if (leftEl) leftEl.textContent = units + ' kg × ₹' + rate + '/kg';
+        if (rightEl) rightEl.textContent = 'Total: ' + formatINR(totalCost);
+        return;
+      }
+
+      var adv = parseFloat(advEl ? advEl.value : 0) || 0;
+      var groc = parseFloat(grocEl ? grocEl.value : 0) || 0;
+      var alc = (parseFloat(pktsEl ? pktsEl.value : 0) || 0) * (parseFloat(alcRateEl ? alcRateEl.value : 0) || 0);
+      var drawn = adv + groc + alc;
+      var net = totalCost - drawn;
+
+      if (dedHeader) dedHeader.textContent = formatINR(drawn);
+      if (leftEl) leftEl.textContent = 'Earned: ' + formatINR(totalCost) + ' • Drawn: ' + formatINR(drawn);
+      if (rightEl) rightEl.textContent = 'Net: ' + formatINR(net);
+    }
+
+    function switchDockTab(tab) {
+      runViewTransition(function() {
+        currentActiveDockTab = tab;
+        currentSpecialLogFilter = 'ALL';
+        var bLab = document.getElementById('dockBtnLabour');
+        var bHar = document.getElementById('dockBtnHarvest');
+        var bSal = document.getElementById('dockBtnSale');
+        if (bLab) bLab.classList.toggle('active', tab === 'labour');
+        if (bHar) bHar.classList.toggle('active', tab === 'harvest');
+        if (bSal) bSal.classList.toggle('active', tab === 'sale');
+
+        var isSale = (tab === 'sale');
+        var isLabour = (tab === 'labour');
+
+        var stripCard = document.getElementById('workerAccountStripCard');
+        var workerGroup = document.getElementById('workerSelectionGroup');
+        var buyerGroup = document.getElementById('salesBuyerGroup');
+        var deductWrap = document.getElementById('deductionsAccordionWrap');
+        var weighTrigger = document.getElementById('weighingScaleTrigger');
+        var basisGroup = document.getElementById('wageBasisGroup');
+        var dayOffBanner = document.getElementById('dayOffBannerWrap');
+        var paymentGroup = document.getElementById('paymentMethodGroup');
+        
+        cancelLogSelection(); // Clear selection on tab switch
+
+        if (stripCard) stripCard.style.display = isSale ? 'none' : 'flex';
+        if (workerGroup) workerGroup.style.display = isSale ? 'none' : 'flex';
+        if (buyerGroup) buyerGroup.style.display = isSale ? 'flex' : 'none';
+        if (deductWrap) deductWrap.style.display = isSale ? 'none' : 'block';
+        if (weighTrigger) weighTrigger.style.display = isLabour ? 'none' : 'flex';
+        if (basisGroup) basisGroup.style.display = isSale ? 'none' : 'flex';
+        if (dayOffBanner) dayOffBanner.style.display = isLabour ? 'flex' : 'none';
+        if (paymentGroup) paymentGroup.style.display = (isLabour || isSale) ? 'flex' : 'none';
+
+        if (!isLabour && isDayOffMode) setDayOffMode(false);
+
+        var taskLabel = document.getElementById('taskFieldLabel');
+        var unitsLabel = document.getElementById('unitsFieldLabel');
+        var rateLabel = document.getElementById('rateFieldLabel');
+        var submitBtn = document.getElementById('mainSubmitBtn');
+
+        if (isSale) {
+          if (taskLabel) taskLabel.textContent = 'Produce';
+          if (unitsLabel) unitsLabel.textContent = 'Weight (Kg)';
+          if (rateLabel) rateLabel.textContent = 'Rate (₹/kg)';
+          if (submitBtn) submitBtn.textContent = 'Save Sale';
+        } else if (tab === 'harvest') {
+          if (taskLabel) taskLabel.textContent = 'Harvest Task';
+          if (unitsLabel) unitsLabel.textContent = 'Weight (Kg)';
+          if (rateLabel) rateLabel.textContent = 'Rate (₹)';
+          if (submitBtn) submitBtn.textContent = 'Save Harvest';
+        } else {
+          if (taskLabel) taskLabel.textContent = 'Task';
+          if (unitsLabel) unitsLabel.textContent = 'Units / Days';
+          if (rateLabel) rateLabel.textContent = 'Rate (₹)';
+          if (submitBtn) submitBtn.textContent = 'Save Entry';
+        }
+
+        populateTaskDropdown();
+        updateSegmentLabels();
+        renderLogsList();
+      });
+    }
+
+    function getFilteredRowsForCurrentTab() {
+      var results = [];
+      for (var i = 0; i < sheetRows.length; i++) {
+        var item = sheetRows[i];
+        var r = getRowData(item);
+        var cat = getRowCategory(r);
+        var rowDate = String(r[0] || '');
+        var worker = String(r[4] || '').trim();
+
+        if (currentDateFilter !== 'ALL' && rowDate.indexOf(currentDateFilter) !== 0) {
+          continue;
+        }
+
+        if (currentActiveDockTab === 'sale' && cat !== 'sale') continue;
+        if (currentActiveDockTab === 'harvest' && cat !== 'harvest') continue;
+        if (currentActiveDockTab === 'labour') {
+          if (cat === 'sale') continue;
+          if (currentActiveWorker && worker.toLowerCase() !== currentActiveWorker.toLowerCase()) {
+            continue;
+          }
+        }
+        results.push(item);
+      }
+
+      results.sort(function(a, b) {
+        var rA = getRowData(a);
+        var rB = getRowData(b);
+        var dA = String(rA[0] || '');
+        var dB = String(rB[0] || '');
+        if (dB !== dA) return dB.localeCompare(dA);
+        return (b.rowIndex_ || 0) - (a.rowIndex_ || 0);
+      });
+      return results;
+    }
+
+    function updateSegmentLabels() {
+      var filtered = getFilteredRowsForCurrentTab();
+      var lbl = document.getElementById('segBtnLogsLabel');
+      if (lbl) lbl.textContent = 'Logs (' + filtered.length + ')';
+    }
+
+    function renderLogsList() {
+      var wrap = document.getElementById('logsSection');
+      if (!wrap) return;
+
+      if (showLogsSkeleton) {
+        var skelHtml = '';
+        for (var s = 0; s < 4; s++) {
+          skelHtml += '<div class="skeleton-log-card">' +
+            '<div style="flex:1; padding-right:16px;">' +
+              '<div class="skeleton-line" style="width:48%; margin-bottom:8px;"></div>' +
+              '<div class="skeleton-line" style="width:78%; height:10px;"></div>' +
+            '</div>' +
+            '<div style="width:68px; text-align:right;">' +
+              '<div class="skeleton-line" style="width:100%; margin-bottom:6px;"></div>' +
+              '<div class="skeleton-line" style="width:70%; height:10px; margin-left:auto;"></div>' +
+            '</div>' +
+          '</div>';
+        }
+        wrap.innerHTML = skelHtml;
+        return;
+      }
+
+      var filtered = getFilteredRowsForCurrentTab();
+      if (filtered.length === 0) {
+        wrap.innerHTML = '<div class="glass-card" style="text-align:center; padding:28px 16px; color:var(--text-secondary); font-size:13px; font-weight:700;">No matching logs found.</div>';
+        return;
+      }
+
+      wrap.innerHTML = filtered.map(function(item) {
+        var r = getRowData(item);
+        var date = String(r[0] || '');
+        var block = String(r[2] || '');
+        var task = String(r[3] || 'Entry');
+        var worker = String(r[4] || '');
+        var units = r[5] || 0;
+        var basis = String(r[6] || '');
+        var cost = parseFloat(r[8]) || 0;
+        var adv = parseFloat(r[9]) || 0;
+        var groc = parseFloat(r[10]) || 0;
+        var alc = parseFloat(r[11]) || 0;
+        var bal = parseFloat(r[12]) || 0;
+        var status = String(r[13] || 'Paid');
+        var notes = String(r[14] || '');
+        var payMethod = String(r[17] || '');
+
+        var displayAmt = cost > 0 ? formatINR(cost) : formatINR(-(adv + groc + alc));
+        var badgeClass = status.toLowerCase().indexOf('advance') !== -1 || bal < 0 ? 'advance' : 'paid';
+        var encDate = encodeURIComponent(date);
+        var encTask = encodeURIComponent(task);
+        var encWorker = encodeURIComponent(worker);
+        
+        var isSelected = selectedLogIds.indexOf(item.rowIndex_) !== -1;
+        var checkSvg = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+        return '<div class="log-card-swipe-container">' +
+          '<button type="button" class="log-delete-reveal-btn" onclick="promptDeleteRow(' + item.rowIndex_ + ', \'' + encDate + '\', \'' + encTask + '\', \'' + encWorker + '\')">Delete</button>' +
+          '<div class="log-item-content ' + (isSelected ? 'selected' : '') + '" ontouchstart="initSwipeGesture(event, this)" ontouchmove="trackSwipeGesture(event, this)" ontouchend="finishSwipeGesture(event, this)" oncontextmenu="handleLogLongPress(event, ' + item.rowIndex_ + ')" onclick="handleLogClick(event, ' + item.rowIndex_ + ')">' +
+            (isSelectionMode ? '<div class="log-checkbox">' + checkSvg + '</div>' : '') +
+            '<div style="flex:1; min-width:0; padding-right:10px; pointer-events:none;">' +
+              '<div class="log-task">' + task + '</div>' +
+              '<div class="log-sub">' + date + ' • ' + worker + ' • ' + block + ' • ' + units + ' ' + basis + (payMethod ? ' • ' + payMethod : '') + (notes ? ' • ' + notes : '') + '</div>' +
+            '</div>' +
+            '<div style="text-align:right; flex-shrink:0; display:flex; flex-direction:column; align-items:flex-end; gap:4px; pointer-events:none;">' +
+              '<div class="log-amt">' + displayAmt + '</div>' +
+              '<div style="display:flex; gap:6px; align-items:center;">' +
+                '<span class="log-status ' + badgeClass + '">' + status + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+    
+    /* Selection Logic */
+    function handleLogLongPress(e, rowIndex) {
+      e.preventDefault();
+      if (!isSelectionMode) {
+        isSelectionMode = true;
+      }
+      toggleLogSelection(rowIndex);
+    }
+    
+    function handleLogClick(e, rowIndex) {
+      if (isSelectionMode) {
+        e.preventDefault();
+        toggleLogSelection(rowIndex);
+      } else {
+        openInvoiceShareModal([rowIndex]);
+      }
+    }
+    
+    function toggleLogSelection(rowIndex) {
+      var idx = selectedLogIds.indexOf(rowIndex);
+      if (idx > -1) {
+        selectedLogIds.splice(idx, 1);
+      } else {
+        selectedLogIds.push(rowIndex);
+      }
+      if (selectedLogIds.length === 0) {
+        isSelectionMode = false;
+      }
+      renderLogsList();
+      updateSelectionActionBar();
+    }
+    
+    function cancelLogSelection() {
+      isSelectionMode = false;
+      selectedLogIds = [];
+      renderLogsList();
+      updateSelectionActionBar();
+    }
+    
+    function updateSelectionActionBar() {
+      var bar = document.getElementById('selectionActionBar');
+      var shareBtn = document.getElementById('selectionShareBtn');
+      if (bar && shareBtn) {
+        if (isSelectionMode) {
+          shareBtn.textContent = 'Share (' + selectedLogIds.length + ')';
+          bar.classList.add('active');
+        } else {
+          bar.classList.remove('active');
+        }
+      }
+    }
+    
+    function shareSelectedLogs() {
+      if (selectedLogIds.length > 0) {
+        openInvoiceShareModal(selectedLogIds);
+        cancelLogSelection();
+      }
+    }
+
+    var swipeStartX = 0;
+    var activeSwipeEl = null;
+    function initSwipeGesture(e, el) {
+      if (isSelectionMode) return;
+      if (!e.touches || !e.touches[0]) return;
+      swipeStartX = e.touches[0].clientX;
+      activeSwipeEl = el;
+    }
+    function trackSwipeGesture(e, el) {
+      if (isSelectionMode) return;
+      if (!activeSwipeEl || activeSwipeEl !== el || !e.touches || !e.touches[0]) return;
+      var diff = e.touches[0].clientX - swipeStartX;
+      if (diff < 0 && diff > -96) {
+        el.style.transform = 'translateX(' + diff + 'px)';
+      } else if (diff >= 0) {
+        el.style.transform = 'translateX(0px)';
+      }
+    }
+    function finishSwipeGesture(e, el) {
+      if (isSelectionMode) return;
+      if (!activeSwipeEl || activeSwipeEl !== el || !e.changedTouches || !e.changedTouches[0]) return;
+      var diff = e.changedTouches[0].clientX - swipeStartX;
+      el.style.transform = diff < -45 ? 'translateX(-84px)' : 'translateX(0px)';
+      activeSwipeEl = null;
+    }
+
+    function promptDeleteRow(rowIndex, encDate, encTask, encWorker) {
+      commitPendingSoftDelete();
+
+      var context = {
+        rowIndex: rowIndex,
+        date: decodeURIComponent(encDate || ''),
+        task: decodeURIComponent(encTask || ''),
+        worker: decodeURIComponent(encWorker || '')
+      };
+
+      var removedItem = null;
+      var removedArrayIdx = -1;
+      for (var i = 0; i < sheetRows.length; i++) {
+        if (sheetRows[i].rowIndex_ === context.rowIndex) {
+          removedItem = sheetRows[i];
+          removedArrayIdx = i;
+          sheetRows.splice(i, 1);
+          break;
+        }
+      }
+
+      if (!removedItem) return;
+
+      safeStorage.setItem('chelavara_logs', JSON.stringify(sheetRows));
+      recalculateAggregates();
+      updateWorkerStripBalance();
+      updateSegmentLabels();
+      renderLogsList();
+      renderCalendar();
+
+      var timerId = setTimeout(function() {
+        if (pendingSoftDelete && pendingSoftDelete.context.rowIndex === context.rowIndex) {
+          var toDelete = pendingSoftDelete.context;
+          pendingSoftDelete = null;
+          dispatchBackendAction({
+            action: 'deleteLabourRow',
+            rowIndex: toDelete.rowIndex,
+            matchCriteria: toDelete,
+            idempotencyKey: generateIdempotencyKey()
+          });
+        }
+      }, 7000);
+
+      pendingSoftDelete = {
+        item: removedItem,
+        arrayIdx: removedArrayIdx,
+        context: context,
+        timerId: timerId
+      };
+
+      showToast('Deleted "' + context.task + '"', undoLastSoftDelete);
+    }
+
+    function commitPendingSoftDelete() {
+      if (!pendingSoftDelete) return;
+      clearTimeout(pendingSoftDelete.timerId);
+      var toDelete = pendingSoftDelete.context;
+      pendingSoftDelete = null;
+      dispatchBackendAction({
+        action: 'deleteLabourRow',
+        rowIndex: toDelete.rowIndex,
+        matchCriteria: toDelete,
+        idempotencyKey: generateIdempotencyKey()
+      });
+    }
+
+    function undoLastSoftDelete() {
+      if (!pendingSoftDelete) return;
+      clearTimeout(pendingSoftDelete.timerId);
+      var restoreIdx = Math.min(pendingSoftDelete.arrayIdx, sheetRows.length);
+      sheetRows.splice(restoreIdx, 0, pendingSoftDelete.item);
+      pendingSoftDelete = null;
+
+      safeStorage.setItem('chelavara_logs', JSON.stringify(sheetRows));
+      recalculateAggregates();
+      updateWorkerStripBalance();
+      updateSegmentLabels();
+      renderLogsList();
+      renderCalendar();
+
+      var toast = document.getElementById('appToast');
+      if (toast) toast.classList.remove('show');
+      showToast('Entry restored');
+    }
+
+    function dispatchBackendAction(payload, onErrorRollback) {
+      if (!payload.idempotencyKey) {
+        payload.idempotencyKey = generateIdempotencyKey();
+      }
+      try {
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+          var fn = payload.action;
+          var runner = google.script.run;
+          if (typeof onErrorRollback === 'function') {
+            runner = runner.withFailureHandler(function() { onErrorRollback(); });
+          }
+          if (typeof runner[fn] === 'function') {
+            runner[fn](payload.rowData || payload.profileData || payload.rowIndex);
+            return Promise.resolve({ status: 'success' });
+          }
+        }
+        if (WEB_APP_URL) {
+          return fetch(WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+          }).catch(function(err) {
+            if (typeof onErrorRollback === 'function') onErrorRollback();
+            throw err;
+          });
+        }
+      } catch (e) {
+        if (typeof onErrorRollback === 'function') onErrorRollback();
+        return Promise.reject(e);
+      }
+      return Promise.resolve({ status: 'success' });
+    }
+
+    function saveLabourEntry(rowData, options) {
+      var opts = options || {};
+      var maxIndex = 2;
+      for (var i = 0; i < sheetRows.length; i++) {
+        if ((sheetRows[i].rowIndex_ || 0) > maxIndex) maxIndex = sheetRows[i].rowIndex_;
+      }
+      var newRowObj = { rowIndex_: maxIndex + 1, row: rowData };
+      var idemKey = opts.idempotencyKey || generateIdempotencyKey();
+
+      if (opts.isPayment) {
+        return dispatchBackendAction({
+          action: 'appendLabourRow',
+          rowData: rowData,
+          idempotencyKey: idemKey
+        }).then(function() {
+          sheetRows.unshift(newRowObj);
+          safeStorage.setItem('chelavara_logs', JSON.stringify(sheetRows));
+          populateWorkerSelectors();
+          recalculateAggregates();
+          updateSegmentLabels();
+          renderLogsList();
+          renderCalendar();
+        });
+      }
+
+      sheetRows.unshift(newRowObj);
+      safeStorage.setItem('chelavara_logs', JSON.stringify(sheetRows));
+
+      populateWorkerSelectors();
+      recalculateAggregates();
+      updateSegmentLabels();
+      renderLogsList();
+      renderCalendar();
+
+      return dispatchBackendAction({
+        action: 'appendLabourRow',
+        rowData: rowData,
+        idempotencyKey: idemKey
+      }, function() {
+        for (var k = 0; k < sheetRows.length; k++) {
+          if (sheetRows[k].rowIndex_ === newRowObj.rowIndex_) {
+            sheetRows.splice(k, 1);
+            break;
+          }
+        }
+        safeStorage.setItem('chelavara_logs', JSON.stringify(sheetRows));
+        populateWorkerSelectors();
+        recalculateAggregates();
+        updateSegmentLabels();
+        renderLogsList();
+        renderCalendar();
+        showToast('Sync failed — entry rolled back');
+      });
+    }
+
+    function submitMainEntry() {
+      if (isSubmitting) return;
+      isSubmitting = true;
+      if (!pendingActionIdempotencyKey) {
+        pendingActionIdempotencyKey = generateIdempotencyKey();
+      }
+      var submitBtn = document.getElementById('mainSubmitBtn');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.setAttribute('aria-busy', 'true');
+      }
+
+      try {
+        var dEl = document.getElementById('inputDate');
+        var bEl = document.getElementById('inputBlock');
+        var tEl = document.getElementById('inputTaskSelect');
+        var uEl = document.getElementById('inputUnits');
+        var rEl = document.getElementById('inputRate');
+        var nEl = document.getElementById('inputNotes');
+
+        var date = (dEl && dEl.value) ? dEl.value : getFormattedCurrentDate();
+        var year = date.slice(0, 4) || '2026';
+        var block = (bEl && bEl.value) ? bEl.value : 'Berane';
+        var rawTaskVal = (tEl && tEl.value) ? tEl.value : 'Pruning';
+        var task = rawTaskVal.indexOf('|') !== -1 ? rawTaskVal.split('|')[0] : rawTaskVal;
+        var units = parseFloat(uEl ? uEl.value : 0) || 0;
+        var rate = parseFloat(rEl ? rEl.value : 0) || 0;
+        var notes = (nEl && nEl.value) ? nEl.value.trim() : '';
+
+        var worker = currentActiveWorker;
+        var wbEl = document.getElementById('inputWageBasis');
+        var basis = (wbEl && wbEl.value) ? wbEl.value : 'Per Day';
+        var adv = 0, groc = 0, alc = 0;
+
+        if (currentActiveDockTab === 'sale') {
+          var buyEl = document.getElementById('inputBuyer');
+          worker = (buyEl && buyEl.value.trim()) ? buyEl.value.trim() : 'Shakeel';
+          basis = 'Per Kg';
+        } else {
+          var advEl = document.getElementById('inputAdvance');
+          var grocEl = document.getElementById('inputGrocery');
+          var pktsEl = document.getElementById('inputAlcoholPkts');
+          var alcRateEl = document.getElementById('inputAlcoholRate');
+
+          adv = parseFloat(advEl ? advEl.value : 0) || 0;
+          groc = parseFloat(grocEl ? grocEl.value : 0) || 0;
+          var alcPkts = parseFloat(pktsEl ? pktsEl.value : 0) || 0;
+          var alcRate = parseFloat(alcRateEl ? alcRateEl.value : 0) || 0;
+          alc = alcPkts * alcRate;
+        }
+
+        var isDayOff = (isDayOffMode || basis === 'Day Off' || task === 'Day Off');
+        if (isDayOff) {
+          basis = 'Day Off';
+          if (currentActiveDockTab === 'labour' && !task) task = 'Day Off';
+        }
+
+        var payMethodEl = document.getElementById('inputPaymentMethod');
+        var payMethod = (currentActiveDockTab === 'labour' || currentActiveDockTab === 'sale')
+          ? ((payMethodEl && payMethodEl.value) ? payMethodEl.value : currentPaymentMethod)
+          : '';
+
+        var finalUnits = isDayOff ? 1 : units;
+        var finalRate = isDayOff ? 0 : rate;
+        var totalCost = isDayOff ? 0 : (finalUnits * finalRate);
+        var totalBorrowed = adv + groc + alc;
+        var balance = totalCost - totalBorrowed;
+        var status = balance < 0 ? 'Advance Paid' : (balance === 0 ? 'Paid' : 'Pending');
+
+        var baseNotes = notes || (isDayOff ? 'Day Off' : '');
+        var finalNotes = (payMethod && baseNotes.indexOf(payMethod) === -1)
+          ? (baseNotes ? (baseNotes + ' [' + payMethod + ']') : ('[' + payMethod + ']'))
+          : baseNotes;
+
+        var rowData = [
+          date, year, block, task, worker,
+          finalUnits, basis, finalRate, totalCost,
+          adv, groc, alc, balance,
+          status, finalNotes, date, totalBorrowed, payMethod
+        ];
+
+        var hasPaymentMovement = (adv > 0 || currentActiveDockTab === 'sale');
+        saveLabourEntry(rowData, {
+          isPayment: hasPaymentMovement,
+          idempotencyKey: pendingActionIdempotencyKey
+        }).then(function() {
+          pendingActionIdempotencyKey = null;
+          showToast(isDayOff ? ('Day Off saved for ' + worker) : 'Entry saved');
+        }).catch(function() {
+          showToast('Network error — tap Save to retry safely');
+        }).finally(function() {
+          isSubmitting = false;
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.removeAttribute('aria-busy');
+          }
+        });
+
+        if (nEl) nEl.value = '';
+        var advReset = document.getElementById('inputAdvance');
+        var grocReset = document.getElementById('inputGrocery');
+        var alcReset = document.getElementById('inputAlcoholPkts');
+        if (advReset) advReset.value = '0';
+        if (grocReset) grocReset.value = '0';
+        if (alcReset) alcReset.value = '0';
+        updateLiveFormPreview();
+      } catch (err) {
+        isSubmitting = false;
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.removeAttribute('aria-busy');
+        }
+      }
+    }
+
+    function toggleFabMenu() {
+      var dial = document.getElementById('fabSpeedDial');
+      var btn = document.getElementById('fabMainTriggerBtn');
+      if (dial) dial.classList.toggle('open');
+      if (btn) btn.classList.toggle('rotate');
+    }
+
+    function closeFabMenu() {
+      var dial = document.getElementById('fabSpeedDial');
+      var btn = document.getElementById('fabMainTriggerBtn');
+      if (dial) dial.classList.remove('open');
+      if (btn) btn.classList.remove('rotate');
+    }
+
+    function triggerFabAction(type) {
+      closeFabMenu();
+      if (type === 'dayoff') {
+        switchDockTab('labour');
+        switchViewSegment('form');
+        setDayOffMode(true);
+      } else if (type === 'advance') {
+        var dEl = document.getElementById('quickAdvDateInput');
+        if (dEl) dEl.value = getFormattedCurrentDate();
+        openModal('quickAdvanceModal');
+      } else if (type === 'alcohol') {
+        updateQuickAlcMath();
+        openModal('quickAlcoholModal');
+      } else if (type === 'maintenance') {
+        openModal('maintenanceModal');
+      } else if (type === 'profile') {
+        openWorkerProfileModal();
+      }
+    }
+
+    function openWorkerProfileModal() {
+      var stats = computeWorkerLedger(currentActiveWorker);
+      var p = workerProfiles[currentActiveWorker] || { name: currentActiveWorker, avatarIdx: 0 };
+
+      document.getElementById('profModalTitle').textContent = currentActiveWorker + "'s Ledger";
+      document.getElementById('profLedgerNetVal').textContent = formatINR(stats.net);
+      document.getElementById('profLedgerStatusSub').textContent = stats.net < 0 ? 'Overdrawn by Worker' : 'Payable to Worker';
+      document.getElementById('profLedgerEarnedVal').textContent = formatINR(stats.earned);
+      document.getElementById('profLedgerBorrowedVal').textContent = formatINR(-stats.borrowed);
+      document.getElementById('profLedgerBalBoxVal').textContent = formatINR(stats.net);
+
+      document.getElementById('profPhoneInput').value = p.phone || '';
+      document.getElementById('profUpiInput').value = p.upi || '';
+      document.getElementById('profAccountInput').value = p.account || '';
+      document.getElementById('profIfscInput').value = p.ifsc || '';
+
+      renderAvatarGalleryGrid(p.avatarIdx || 0);
+      openModal('workerProfileModal');
+    }
+
+    function renderAvatarGalleryGrid(selectedIdx) {
+      var grid = document.getElementById('profAvatarGalleryGrid');
+      if (!grid) return;
+      var html = '';
+      for (var i = 0; i < 15; i++) {
+        html += '<div class="avatar-option-cell ' + (i === selectedIdx ? 'selected' : '') + '" onclick="selectProfileAvatarIdx(' + i + ')">' +
+          generateAvatarSvg(currentActiveWorker, i) +
+        '</div>';
+      }
+      grid.innerHTML = html;
+    }
+
+    function selectProfileAvatarIdx(idx) {
+      if (!workerProfiles[currentActiveWorker]) {
+        workerProfiles[currentActiveWorker] = { name: currentActiveWorker };
+      }
+      workerProfiles[currentActiveWorker].avatarIdx = idx;
+      workerProfiles[currentActiveWorker].avatarDataUrl = '';
+      renderAvatarGalleryGrid(idx);
+      populateWorkerSelectors();
+    }
+
+    function handleProfilePhotoUpload(event) {
+      var file = event.target && event.target.files ? event.target.files[0] : null;
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var img = new Image();
+        img.onload = function() {
+          var canvas = document.createElement('canvas');
+          canvas.width = 160;
+          canvas.height = 160;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, 160, 160);
+          var dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          if (!workerProfiles[currentActiveWorker]) {
+            workerProfiles[currentActiveWorker] = { name: currentActiveWorker };
+          }
+          workerProfiles[currentActiveWorker].avatarDataUrl = dataUrl;
+          safeStorage.setItem('chelavara_profiles', JSON.stringify(workerProfiles));
+          populateWorkerSelectors();
+          showToast('Photo updated');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function saveWorkerProfileDetails() {
+      var prevProfile = JSON.parse(JSON.stringify(workerProfiles[currentActiveWorker] || { name: currentActiveWorker }));
+      if (!workerProfiles[currentActiveWorker]) workerProfiles[currentActiveWorker] = { name: currentActiveWorker };
+      var p = workerProfiles[currentActiveWorker];
+      var ph = document.getElementById('profPhoneInput');
+      var up = document.getElementById('profUpiInput');
+      var ac = document.getElementById('profAccountInput');
+      var ifs = document.getElementById('profIfscInput');
+
+      p.phone = ph ? ph.value.trim() : '';
+      p.upi = up ? up.value.trim() : '';
+      p.account = ac ? ac.value.trim() : '';
+      p.ifsc = ifs ? ifs.value.trim() : '';
+      safeStorage.setItem('chelavara_profiles', JSON.stringify(workerProfiles));
+      populateWorkerSelectors();
+      closeModal('workerProfileModal');
+      showToast('Profile saved');
+
+      dispatchBackendAction({
+        action: 'saveWorkerProfile',
+        profileData: p,
+        idempotencyKey: generateIdempotencyKey()
+      }, function() {
+        workerProfiles[currentActiveWorker] = prevProfile;
+        safeStorage.setItem('chelavara_profiles', JSON.stringify(workerProfiles));
+        populateWorkerSelectors();
+        showToast('Profile sync failed — rolled back');
+      });
+    }
+
+    function openWhatsAppModal() {
+      var stats = computeWorkerLedger(currentActiveWorker);
+      var p = workerProfiles[currentActiveWorker] || {};
+      document.getElementById('waModalRecipientSub').textContent = 'Recipient: ' + currentActiveWorker;
+      document.getElementById('waPhoneInput').value = p.phone || '9845123456';
+
+      var statusLabel = stats.net < 0 ? '(Overdrawn)' : '(Payable)';
+      var text = 'Namaskara ' + currentActiveWorker + ',\n' +
+        'Chelavara Plantation Labour Account Ledger:\n' +
+        '• Total Earned Wages: ' + formatINR(stats.earned) + '\n' +
+        '• Cash & Grocery Drawn: ' + formatINR(stats.adv + stats.groc) + '\n' +
+        '• Alcohol Deduction: ' + formatINR(stats.alc) + '\n' +
+        '• Total Borrowed: ' + formatINR(stats.borrowed) + '\n' +
+        '• Current Balance Due: ' + formatINR(stats.net) + ' ' + statusLabel + '\n' +
+        'Bank A/C: ' + (p.account || '50100345678912') + ' | IFSC: ' + (p.ifsc || 'HDFC0001234');
+
+      document.getElementById('waPreviewTextarea').value = text;
+      openModal('whatsappShareModal');
+    }
+
+    function copyTextFromElement(elId, msg) {
+      var el = document.getElementById(elId);
+      if (!el) return;
+      el.select();
+      try {
+        document.execCommand('copy');
+        showToast(msg || 'Copied');
+      } catch (e) {}
+    }
+
+    function launchWhatsAppStatement() {
+      var phone = String(document.getElementById('waPhoneInput').value || '').replace(/[^0-9]/g, '');
+      if (phone.length === 10) phone = '91' + phone;
+      var text = encodeURIComponent(document.getElementById('waPreviewTextarea').value || '');
+      window.open('https://api.whatsapp.com/send?phone=' + phone + '&text=' + text, '_blank');
+    }
+
+    function openUpiModal() {
+      var p = workerProfiles[currentActiveWorker] || {};
+      var vpa = p.upi || (currentActiveWorker.toLowerCase().replace(/[^a-z0-9]/g, '') + '@hdfcbank');
+      document.getElementById('upiVpaReadout').textContent = vpa;
+      document.getElementById('upiBankSubReadout').textContent = 'A/C: ' + (p.account || '50100345678912') + ' | IFSC: ' + (p.ifsc || 'HDFC0001234');
+      updateUpiButtonText();
+      openModal('upiPayModal');
+    }
+
+    function selectUpiPreset(amt, btnEl) {
+      var chips = document.querySelectorAll('#upiPresetChips .quick-chip');
+      for (var i = 0; i < chips.length; i++) chips[i].classList.remove('active');
+      if (btnEl) btnEl.classList.add('active');
+      document.getElementById('upiAmountInput').value = amt;
+      updateUpiButtonText();
+    }
+
+    function updateUpiButtonText() {
+      var amt = parseFloat(document.getElementById('upiAmountInput').value) || 0;
+      var btn = document.getElementById('upiConfirmRecordBtn');
+      if (btn) btn.textContent = 'Pay & Record ' + formatINR(amt);
+    }
+
+    function copyUpiVpa() {
+      var vpa = document.getElementById('upiVpaReadout').textContent;
+      var temp = document.createElement('textarea');
+      temp.value = vpa;
+      document.body.appendChild(temp);
+      temp.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(temp);
+      showToast('UPI VPA copied');
+    }
+
+    function launchUpiIntent() {
+      var vpa = document.getElementById('upiVpaReadout').textContent;
+      var amt = parseFloat(document.getElementById('upiAmountInput').value) || 0;
+      var url = 'upi://pay?pa=' + encodeURIComponent(vpa) + '&pn=' + encodeURIComponent(currentActiveWorker) + '&am=' + amt + '&cu=INR';
+      window.location.href = url;
+    }
+
+    function executeUpiPaymentAndRecord() {
+      var amt = parseFloat(document.getElementById('upiAmountInput').value) || 0;
+      if (amt <= 0 || isSubmitting) return;
+
+      isSubmitting = true;
+      var btn = document.getElementById('upiConfirmRecordBtn');
+      if (btn) {
+        btn.disabled = true;
+        btn.setAttribute('aria-busy', 'true');
+      }
+
+      if (!pendingActionIdempotencyKey) {
+        pendingActionIdempotencyKey = generateIdempotencyKey();
+      }
+
+      var payMethodEl = document.getElementById('upiModalPaymentMethod');
+      var payMethod = (payMethodEl && payMethodEl.value) ? payMethodEl.value : 'GPay';
+      var date = document.getElementById('inputDate').value || getFormattedCurrentDate();
+      var year = date.slice(0, 4) || '2026';
+      var block = document.getElementById('inputBlock').value || 'Both';
+
+      var rowData = [
+        date, year, block, 'Cash Advance Draw', currentActiveWorker,
+        1, 'Day Off', 0, 0,
+        amt, 0, 0, -amt,
+        'Advance Paid', payMethod + ' Payment ₹' + amt + ' to ' + currentActiveWorker, date, amt, payMethod
+      ];
+
+      saveLabourEntry(rowData, {
+        isPayment: true,
+        idempotencyKey: pendingActionIdempotencyKey
+      }).then(function() {
+        pendingActionIdempotencyKey = null;
+        closeModal('upiPayModal');
+        showToast(payMethod + ' ' + formatINR(amt) + ' recorded');
+      }).catch(function() {
+        showToast('Payment record failed — retry safely');
+      }).finally(function() {
+        isSubmitting = false;
+        if (btn) {
+          btn.disabled = false;
+          btn.removeAttribute('aria-busy');
+        }
+      });
+    }
+
+    function selectAdvPreset(amt, btnEl) {
+      var chips = document.querySelectorAll('#quickAdvPresetChips .quick-chip');
+      for (var i = 0; i < chips.length; i++) chips[i].classList.remove('active');
+      if (btnEl) btnEl.classList.add('active');
+      document.getElementById('quickAdvAmountInput').value = amt;
+    }
+
+    function submitQuickAdvance() {
+      var worker = document.getElementById('quickAdvWorkerSelect').value || currentActiveWorker;
+      var amt = parseFloat(document.getElementById('quickAdvAmountInput').value) || 0;
+      if (amt <= 0 || isSubmitting) return;
+
+      isSubmitting = true;
+      if (!pendingActionIdempotencyKey) {
+        pendingActionIdempotencyKey = generateIdempotencyKey();
+      }
+
+      var payMethodEl = document.getElementById('quickAdvPaymentMethod');
+      var payMethod = (payMethodEl && payMethodEl.value) ? payMethodEl.value : 'Cash';
+      var rawNotes = document.getElementById('quickAdvNotesInput').value.trim();
+      var notes = (rawNotes ? rawNotes : ('Advance ₹' + amt)) + ' [' + payMethod + ']';
+      var date = document.getElementById('quickAdvDateInput').value || getFormattedCurrentDate();
+      var block = document.getElementById('inputBlock').value || 'Pudenkaad';
+      var rowData = [
+        date, date.slice(0, 4), block, 'Day Off', worker,
+        1, 'Day Off', 0, 0,
+        amt, 0, 0, -amt,
+        'Advance Paid', notes, date, amt, payMethod
+      ];
+      saveLabourEntry(rowData, {
+        isPayment: true,
+        idempotencyKey: pendingActionIdempotencyKey
+      }).then(function() {
+        pendingActionIdempotencyKey = null;
+        closeModal('quickAdvanceModal');
+        showToast('Advance ' + formatINR(amt) + ' saved');
+      }).finally(function() {
+        isSubmitting = false;
+      });
+    }
+
+    function selectAlcRatePreset(rate, btnEl) {
+      var chips = document.querySelectorAll('#quickAlcRateChips .quick-chip');
+      for (var i = 0; i < chips.length; i++) chips[i].classList.remove('active');
+      if (btnEl) btnEl.classList.add('active');
+      document.getElementById('quickAlcRateInput').value = rate;
+      updateQuickAlcMath();
+    }
+
+    function updateQuickAlcMath() {
+      var pkts = parseFloat(document.getElementById('quickAlcPacketsInput').value) || 0;
+      var rate = parseFloat(document.getElementById('quickAlcRateInput').value) || 0;
+      document.getElementById('quickAlcTotalReadout').textContent = formatINR(pkts * rate);
+    }
+
+    function submitQuickAlcohol() {
+      var worker = document.getElementById('quickAlcWorkerSelect').value || currentActiveWorker;
+      var pkts = parseFloat(document.getElementById('quickAlcPacketsInput').value) || 0;
+      var rate = parseFloat(document.getElementById('quickAlcRateInput').value) || 0;
+      var total = pkts * rate;
+      if (total <= 0) return;
+      var date = document.getElementById('inputDate').value || getFormattedCurrentDate();
+      var block = document.getElementById('inputBlock').value || 'Pudenkaad';
+      var rowData = [
+        date, date.slice(0, 4), block, 'Day Off', worker,
+        1, 'Day Off', 0, 0,
+        0, 0, total, -total,
+        'Advance Paid', 'drinks (' + pkts + ' pkts @ ₹' + rate + ')', date, total, 'Cash'
+      ];
+      saveLabourEntry(rowData, { idempotencyKey: generateIdempotencyKey() });
+      closeModal('quickAlcoholModal');
+      showToast('Alcohol ' + formatINR(total) + ' saved');
+    }
+
+    function submitMaintenanceRecord() {
+      var asset = document.getElementById('maintAssetInput').value.trim();
+      var block = document.getElementById('maintBlockSelect').value || 'Berane';
+      var type = document.getElementById('maintTypeSelect').value || 'Irrigation & Pipeline';
+      var cost = parseFloat(document.getElementById('maintCostInput').value) || 0;
+      var tech = document.getElementById('maintTechInput').value.trim() || 'Estate Maintenance';
+      var desc = document.getElementById('maintDescInput').value.trim() || '';
+
+      if (!asset) {
+        showToast('Enter asset or system name');
+        return;
+      }
+
+      var date = document.getElementById('inputDate').value || getFormattedCurrentDate();
+      var year = date.slice(0, 4) || '2026';
+      var rowData = [
+        date, year, block, 'Maintenance: ' + type, tech,
+        1, 'Maintenance', cost, cost,
+        0, 0, 0, 0,
+        'Paid', '[Maintenance] ' + asset + (desc ? ' - ' + desc : ''), date, 0, 'Cash'
+      ];
+
+      saveLabourEntry(rowData, { idempotencyKey: generateIdempotencyKey() });
+      closeModal('maintenanceModal');
+      showToast('Maintenance saved');
+    }
+
+    function addScaleBagWeight(wt) {
+      var w = parseFloat(wt) || 0;
+      if (w <= 0) return;
+      scaleBags.push(w);
+      renderScaleReadout();
+    }
+
+    function addManualScaleBag() {
+      var inp = document.getElementById('scaleManualInput');
+      var w = parseFloat(inp ? inp.value : 0) || 0;
+      if (w <= 0) return;
+      scaleBags.push(w);
+      if (inp) inp.value = '';
+      renderScaleReadout();
+    }
+
+    function clearScaleBags() {
+      scaleBags = [];
+      renderScaleReadout();
+    }
+
+    function renderScaleReadout() {
+      var sum = 0;
+      for (var i = 0; i < scaleBags.length; i++) sum += scaleBags[i];
+      var stdBags = (sum / 50).toFixed(2);
+
+      var totEl = document.getElementById('scaleModalTotalKg');
+      var subEl = document.getElementById('scaleModalBagsSub');
+      var trigBadge = document.getElementById('scaleTriggerBadge');
+      var listEl = document.getElementById('scaleBagsListContainer');
+
+      if (totEl) totEl.textContent = sum.toFixed(1) + ' kg';
+      if (subEl) subEl.textContent = scaleBags.length + ' Bags • ' + stdBags + ' Std Bags (50kg)';
+      if (trigBadge) trigBadge.textContent = sum.toFixed(1) + ' kg (' + scaleBags.length + ' bags)';
+      if (listEl) {
+        listEl.innerHTML = scaleBags.map(function(w, idx) {
+          return '<div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid var(--border-subtle);">' +
+            '<span>Bag #' + (idx + 1) + '</span><strong>' + w + ' kg</strong>' +
+          '</div>';
+        }).join('');
+      }
+    }
+
+    function applyScaleWeightToForm() {
+      var sum = 0;
+      for (var i = 0; i < scaleBags.length; i++) sum += scaleBags[i];
+      var uEl = document.getElementById('inputUnits');
+      if (uEl && sum > 0) uEl.value = sum.toFixed(1);
+      updateLiveFormPreview();
+      closeModal('weighingScaleModal');
+      showToast('Applied ' + sum.toFixed(1) + ' kg');
+    }
+
+    function openCalendarModal() {
+      renderCalendar();
+      openModal('calendarModal');
+    }
+
+    function shiftCalendarMonth(delta) {
+      calendarMonth += delta;
+      if (calendarMonth < 0) { calendarMonth = 11; calendarYear -= 1; }
+      if (calendarMonth > 11) { calendarMonth = 0; calendarYear += 1; }
+      renderCalendar();
+    }
+
+    function applyDatePeriodFilter(period, btnEl) {
+      currentDateFilter = period;
+      var chips = document.querySelectorAll('#calendarModal .quick-chip');
+      for (var i = 0; i < chips.length; i++) chips[i].classList.remove('active');
+      if (btnEl) btnEl.classList.add('active');
+
+      var topBtn = document.getElementById('calendarTopBtn');
+      if (topBtn) topBtn.classList.toggle('has-filter', period !== 'ALL');
+
+      updateSegmentLabels();
+      renderLogsList();
+    }
+
+    function renderCalendar() {
+      var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      var titleEl = document.getElementById('calMonthYearTitle');
+      if (titleEl) titleEl.textContent = monthNames[calendarMonth] + ' ' + calendarYear;
+
+      var grid = document.getElementById('calendarGridContainer');
+      if (!grid) return;
+
+      var firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
+      var daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+      var monthPrefix = calendarYear + '-' + String(calendarMonth + 1).padStart(2, '0');
+
+      var dateFlags = {};
+      for (var i = 0; i < sheetRows.length; i++) {
+        var r = getRowData(sheetRows[i]);
+        var d = String(r[0] || '');
+        if (d.indexOf(monthPrefix) === 0) {
+          if (!dateFlags[d]) dateFlags[d] = { work: false, dayoff: false };
+          var basis = String(r[6] || '');
+          if (basis === 'Day Off' || String(r[3] || '') === 'Day Off') dateFlags[d].dayoff = true;
+          else dateFlags[d].work = true;
+        }
+      }
+
+      var html = '';
+      for (var b = 0; b < firstDay; b++) {
+        html += '<div></div>';
+      }
+      for (var day = 1; day <= daysInMonth; day++) {
+        var dStr = monthPrefix + '-' + String(day).padStart(2, '0');
+        var fl = dateFlags[dStr];
+        var dots = '';
+        if (fl) {
+          dots = '<div class="cal-dots">' +
+            (fl.work ? '<span class="cal-dot" style="background:var(--accent-positive);"></span>' : '') +
+            (fl.dayoff ? '<span class="cal-dot" style="background:var(--accent-danger);"></span>' : '') +
+          '</div>';
+        }
+        var isSel = (dStr === selectedCalendarDate);
+        html += '<button type="button" class="cal-day-cell ' + (isSel ? 'selected' : '') + '" onclick="selectCalendarDayCell(\'' + dStr + '\')">' +
+          '<span>' + day + '</span>' + dots +
+        '</button>';
+      }
+      grid.innerHTML = html;
+    }
+
+    function selectCalendarDayCell(dateStr) {
+      selectedCalendarDate = dateStr;
+      currentDateFilter = dateStr;
+      var topBtn = document.getElementById('calendarTopBtn');
+      if (topBtn) topBtn.classList.add('has-filter');
+      renderCalendar();
+      updateSegmentLabels();
+      renderLogsList();
+    }
+
+    function calendarJumpToForm(markDayOff) {
+      var dEl = document.getElementById('inputDate');
+      if (dEl && selectedCalendarDate) dEl.value = selectedCalendarDate;
+      closeModal('calendarModal');
+      switchDockTab('labour');
+      switchViewSegment('form');
+      setDayOffMode(Boolean(markDayOff));
+    }
+
+    function openWorkerCategoryDrilldown(category) {
+      var catSel = document.getElementById('catWinCategorySelect');
+      var wrkSel = document.getElementById('catWinWorkerSelect');
+      if (catSel) catSel.value = category;
+      populateWorkerSelectors();
+      if (wrkSel) wrkSel.value = currentActiveWorker;
+      renderCategoryWindow();
+      openModal('categoryLogsModal');
+    }
+
+    function openHamburgerLogCategory(category) {
+      closeModal('drawerModal');
+      var catSel = document.getElementById('catWinCategorySelect');
+      var wrkSel = document.getElementById('catWinWorkerSelect');
+      if (catSel) catSel.value = category;
+      populateWorkerSelectors();
+      if (wrkSel) wrkSel.value = (category === 'maintenance' || category === 'estate') ? 'ALL' : currentActiveWorker;
+      renderCategoryWindow();
+      openModal('categoryLogsModal');
+    }
+
+    function renderCategoryWindow() {
+      var cat = document.getElementById('catWinCategorySelect').value || 'all';
+      var wrk = document.getElementById('catWinWorkerSelect').value || 'ALL';
+      var blk = document.getElementById('catWinBlockSelect').value || 'ALL';
+      var per = document.getElementById('catWinPeriodSelect').value || 'ALL';
+
+      var matched = [];
+      var sumEarned = 0, sumAdv = 0, sumGroc = 0, sumAlc = 0, sumTrees = 0, sumMaint = 0;
+
+      for (var i = 0; i < sheetRows.length; i++) {
+        var r = getRowData(sheetRows[i]);
+        var d = String(r[0] || '');
+        var b = String(r[2] || '');
+        var task = String(r[3] || '');
+        var w = String(r[4] || '').trim();
+        var units = parseFloat(r[5]) || 0;
+        var basis = String(r[6] || '');
+        var cost = parseFloat(r[8]) || 0;
+        var adv = parseFloat(r[9]) || 0;
+        var groc = parseFloat(r[10]) || 0;
+        var alc = parseFloat(r[11]) || 0;
+        var rowCat = getRowCategory(r);
+
+        if (wrk !== 'ALL' && w.toLowerCase() !== wrk.toLowerCase()) continue;
+        if (blk !== 'ALL' && b !== blk) continue;
+        if (per !== 'ALL' && d.indexOf(per) !== 0) continue;
+
+        if (cat === 'alcohol' && alc <= 0) continue;
+        if (cat === 'grocery' && (adv + groc) <= 0) continue;
+        if (cat === 'wage' && cost <= 0) continue;
+        if (cat === 'maintenance' && rowCat !== 'maintenance') continue;
+
+        matched.push(r);
+        sumEarned += cost;
+        sumAdv += adv;
+        sumGroc += groc;
+        sumAlc += alc;
+        if (basis === 'Per Tree') sumTrees += units;
+        if (rowCat === 'maintenance') sumMaint += cost;
+      }
+
+      var boxesEl = document.getElementById('catWinSummaryBoxes');
+      if (boxesEl) {
+        if (cat === 'alcohol') {
+          boxesEl.innerHTML =
+            '<div class="ledger-metric-box"><span>Total Alcohol</span><strong>' + formatINR(sumAlc) + '</strong></div>' +
+            '<div class="ledger-metric-box"><span>Est. Packets</span><strong>' + Math.round(sumAlc / 150) + '</strong></div>' +
+            '<div class="ledger-metric-box"><span>Entries</span><strong>' + matched.length + '</strong></div>';
+        } else if (cat === 'grocery') {
+          boxesEl.innerHTML =
+            '<div class="ledger-metric-box"><span>Cash Advance</span><strong>' + formatINR(sumAdv) + '</strong></div>' +
+            '<div class="ledger-metric-box"><span>Grocery</span><strong>' + formatINR(sumGroc) + '</strong></div>' +
+            '<div class="ledger-metric-box"><span>Total Drawn</span><strong>' + formatINR(sumAdv + sumGroc) + '</strong></div>';
+        } else if (cat === 'wage' || cat === 'estate') {
+          boxesEl.innerHTML =
+            '<div class="ledger-metric-box"><span>Total Wages</span><strong>' + formatINR(sumEarned) + '</strong></div>' +
+            '<div class="ledger-metric-box"><span>Trees Worked</span><strong>' + sumTrees.toLocaleString('en-IN') + '</strong></div>' +
+            '<div class="ledger-metric-box"><span>Records</span><strong>' + matched.length + '</strong></div>';
+        } else if (cat === 'maintenance') {
+          boxesEl.innerHTML =
+            '<div class="ledger-metric-box"><span>Maint. Spend</span><strong>' + formatINR(sumMaint) + '</strong></div>' +
+            '<div class="ledger-metric-box"><span>Block</span><strong>' + blk + '</strong></div>' +
+            '<div class="ledger-metric-box"><span>Records</span><strong>' + matched.length + '</strong></div>';
+        } else {
+          boxesEl.innerHTML =
+            '<div class="ledger-metric-box"><span>Work Earned</span><strong>' + formatINR(sumEarned) + '</strong></div>' +
+            '<div class="ledger-metric-box"><span>Borrowed</span><strong>' + formatINR(sumAdv + sumGroc + sumAlc) + '</strong></div>' +
+            '<div class="ledger-metric-box"><span>Net Balance</span><strong>' + formatINR(sumEarned - (sumAdv + sumGroc + sumAlc)) + '</strong></div>';
+        }
+      }
+
+      var listContainer = document.getElementById('catWinLogsContainer');
+      if (listContainer) {
+        if (matched.length === 0) {
+          listContainer.innerHTML = '<div style="text-align:center; padding:18px; color:var(--text-secondary); font-size:12.5px;">No matching records</div>';
+        } else {
+          listContainer.innerHTML = matched.map(function(r) {
+            var amt = (parseFloat(r[8]) || 0) > 0
+              ? formatINR(r[8])
+              : formatINR(-((parseFloat(r[9]) || 0) + (parseFloat(r[10]) || 0) + (parseFloat(r[11]) || 0)));
+            return '<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 4px; border-bottom:1px solid var(--border-subtle); font-size:12.5px;">' +
+              '<div><strong>' + (r[3] || 'Entry') + '</strong><div style="font-size:11px; color:var(--text-secondary);">' + r[0] + ' • ' + r[4] + ' • ' + r[2] + ' • ' + r[5] + ' ' + r[6] + '</div></div>' +
+              '<strong style="font-family:var(--font-mono); color:var(--card-peach);">' + amt + '</strong>' +
+            '</div>';
+          }).join('');
+        }
+      }
+    }
+
+    function saveNewWorkerAction() {
+      var nameInp = document.getElementById('newWorkerNameInput');
+      var phoneInp = document.getElementById('newWorkerPhoneInput');
+      var upiInp = document.getElementById('newWorkerUpiInput');
+      var name = nameInp ? nameInp.value.trim() : '';
+      if (!name) return;
+
+      workerProfiles[name] = {
+        name: name,
+        phone: phoneInp ? phoneInp.value.trim() : '',
+        upi: upiInp ? upiInp.value.trim() : '',
+        account: '',
+        ifsc: '',
+        avatarIdx: Object.keys(workerProfiles).length % 15
+      };
+      safeStorage.setItem('chelavara_profiles', JSON.stringify(workerProfiles));
+      currentActiveWorker = name;
+      populateWorkerSelectors();
+      closeModal('addNewWorkerModal');
+      if (nameInp) nameInp.value = '';
+      showToast('Added ' + name);
+
+      dispatchBackendAction({
+        action: 'saveWorkerProfile',
+        profileData: workerProfiles[name],
+        idempotencyKey: generateIdempotencyKey()
+      });
+    }
+
+    function saveCustomTaskAction() {
+      var nameInp = document.getElementById('customTaskNameInput');
+      var rateInp = document.getElementById('customTaskRateInput');
+      var name = nameInp ? nameInp.value.trim() : '';
+      var rate = parseFloat(rateInp ? rateInp.value : 500) || 0;
+      if (!name) return;
+
+      var basis = currentActiveDockTab === 'sale' ? 'Per Kg' : 'Per Day';
+      TASK_CATALOG[currentActiveDockTab].unshift({
+        label: name + ' (₹' + rate + ')',
+        task: name,
+        rate: rate,
+        basis: basis
+      });
+      populateTaskDropdown();
+      closeModal('customTaskModal');
+      if (nameInp) nameInp.value = '';
+      showToast('Added ' + name);
+    }
+    
+    function openInvoiceShareModal(rowIndices) {
+      if(!rowIndices || rowIndices.length === 0) return;
+      var items = [];
+      var totalCost = 0;
+      var totalAdv = 0;
+      var totalGroc = 0;
+      var totalAlc = 0;
+      
+      for (var i = 0; i < sheetRows.length; i++) {
+        if (rowIndices.indexOf(sheetRows[i].rowIndex_) !== -1) {
+          items.push(sheetRows[i]);
+        }
+      }
+      if (items.length === 0) return;
+      
+      var workerSet = {};
+      var dateRange = [null, null];
+      var listHtml = '';
+      
+      for(var k=0; k<items.length; k++) {
+        var r = getRowData(items[k]);
+        var cost = parseFloat(r[8]) || 0;
+        var adv = parseFloat(r[9]) || 0;
+        var groc = parseFloat(r[10]) || 0;
+        var alc = parseFloat(r[11]) || 0;
+        totalCost += cost; totalAdv += adv; totalGroc += groc; totalAlc += alc;
+        workerSet[String(r[4]||'')] = true;
+        
+        var date = r[0];
+        if(!dateRange[0] || date < dateRange[0]) dateRange[0] = date;
+        if(!dateRange[1] || date > dateRange[1]) dateRange[1] = date;
+        
+        listHtml += '<div style="font-size:11px; padding:6px 0; border-bottom:1px solid var(--border-subtle);">' +
+          '<div style="display:flex; justify-content:space-between; margin-bottom:2px;"><strong style="font-size:12px;">' + r[3] + '</strong><strong style="font-family:var(--font-mono);">' + formatINR(cost > 0 ? cost : -(adv+groc+alc)) + '</strong></div>' +
+          '<div style="color:var(--text-secondary);">' + r[0] + ' • ' + r[4] + ' • ' + r[5] + ' ' + r[6] + '</div>' +
+        '</div>';
+      }
+      
+      var workersArr = Object.keys(workerSet);
+      var workerStr = workersArr.length > 2 ? workersArr.length + ' Workers' : workersArr.join(', ');
+      var dateStr = (dateRange[0] === dateRange[1]) ? dateRange[0] : (dateRange[0] + ' to ' + dateRange[1]);
+      var totalDrawn = totalAdv + totalGroc + totalAlc;
+      var net = totalCost - totalDrawn;
+      var status = net < 0 ? 'Advance Paid' : 'Settled';
+      
+      var html = '<div class="invoice-header">' +
+        '<div>' +
+          '<div class="invoice-logo">Chelavara Estate</div>' +
+          '<div style="font-size:10.5px; color:var(--text-secondary); margin-top:4px;">Invoice / Log Summary • ' + dateStr + '</div>' +
+        '</div>' +
+        '<div><span class="invoice-status-pill">' + status + '</span></div>' +
+      '</div>' +
+      '<div style="margin-bottom:16px;">' +
+        '<div style="font-size:11px; font-weight:800; color:var(--text-secondary); text-transform:uppercase; margin-bottom:4px;">Entity Details</div>' +
+        '<div style="font-size:14px; font-weight:800;">' + workerStr + '</div>' +
+        '<div style="font-size:12px; color:var(--text-secondary);">' + items.length + ' Log Entries Included</div>' +
+      '</div>' +
+      '<div style="margin-bottom:16px;">' +
+        '<div style="font-size:11px; font-weight:800; color:var(--text-secondary); text-transform:uppercase; margin-bottom:4px;">Entries Breakdown</div>' +
+        listHtml +
+      '</div>' +
+      '<div>' +
+        '<div style="font-size:11px; font-weight:800; color:var(--text-secondary); text-transform:uppercase; margin-bottom:8px;">Aggregate Breakdown</div>' +
+        (totalCost > 0 ? '<div class="invoice-row"><span>Total Base Wage</span><strong>' + formatINR(totalCost) + '</strong></div>' : '') +
+        (totalAdv > 0 ? '<div class="invoice-row"><span>Total Cash Advance</span><strong style="color:var(--accent-danger);">-' + formatINR(totalAdv) + '</strong></div>' : '') +
+        (totalGroc > 0 ? '<div class="invoice-row"><span>Total Grocery Draw</span><strong style="color:var(--accent-danger);">-' + formatINR(totalGroc) + '</strong></div>' : '') +
+        (totalAlc > 0 ? '<div class="invoice-row"><span>Total Alcohol Draw</span><strong style="color:var(--accent-danger);">-' + formatINR(totalAlc) + '</strong></div>' : '') +
+      '</div>' +
+      '<div class="invoice-total-box">' +
+        '<span>Net Payout</span>' +
+        '<span>' + formatINR(net) + '</span>' +
+      '</div>';
+
+      var container = document.getElementById('invoiceCardContent');
+      if(container) container.innerHTML = html;
+      openModal('invoiceShareModal');
+    }
+
+    function shareInvoiceData() {
+      var container = document.getElementById('invoiceCardContent');
+      if(!container) return;
+      var text = container.innerText;
+      if (navigator.share) {
+        navigator.share({
+          title: 'Estate Log Receipt',
+          text: text
+        }).catch(function(e){});
+      } else {
+        var temp = document.createElement('textarea');
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        try { document.execCommand('copy'); } catch(e){}
+        document.body.removeChild(temp);
+        showToast('Receipt copied to clipboard');
+      }
+    }
+
+    function fetchRemoteSheetData(isBackgroundRevalidate) {
+      if (!WEB_APP_URL) return;
+      var balanceBadge = document.getElementById('workerBalanceBadge');
+      if (isBackgroundRevalidate && balanceBadge) {
+        balanceBadge.classList.add('revalidating');
+      }
+
+      clearTimeout(skeletonTimer);
+      if (!isBackgroundRevalidate) {
+        skeletonTimer = setTimeout(function() {
+          showLogsSkeleton = true;
+          if (currentActiveSegment === 'logs') renderLogsList();
+        }, 300);
+      }
+
+      try {
+        fetch(WEB_APP_URL + '?action=getLabourData')
+          .then(function(res) { return res.json(); })
+          .then(function(data) {
+            clearTimeout(skeletonTimer);
+            showLogsSkeleton = false;
+            if (balanceBadge) balanceBadge.classList.remove('revalidating');
+            if (data && Array.isArray(data.rows) && data.rows.length > 0) {
+              sheetRows = data.rows;
+              safeStorage.setItem('chelavara_logs', JSON.stringify(sheetRows));
+              populateWorkerSelectors();
+              recalculateAggregates();
+              updateSegmentLabels();
+              renderLogsList();
+              renderCalendar();
+            } else if (currentActiveSegment === 'logs') {
+              renderLogsList();
+            }
+          })
+          .catch(function() {
+            var cbName = 'chelavaraSyncCb_' + Date.now();
+            var scriptEl = document.createElement('script');
+            window[cbName] = function(data) {
+              delete window[cbName];
+              if (scriptEl.parentNode) scriptEl.parentNode.removeChild(scriptEl);
+              clearTimeout(skeletonTimer);
+              showLogsSkeleton = false;
+              if (balanceBadge) balanceBadge.classList.remove('revalidating');
+              if (data && Array.isArray(data.rows) && data.rows.length > 0) {
+                sheetRows = data.rows;
+                safeStorage.setItem('chelavara_logs', JSON.stringify(sheetRows));
+                populateWorkerSelectors();
+                recalculateAggregates();
+                updateSegmentLabels();
+                renderLogsList();
+                renderCalendar();
+              } else if (currentActiveSegment === 'logs') {
+                renderLogsList();
+              }
+            };
+            scriptEl.onerror = function() {
+              delete window[cbName];
+              if (scriptEl.parentNode) scriptEl.parentNode.removeChild(scriptEl);
+              clearTimeout(skeletonTimer);
+              showLogsSkeleton = false;
+              if (balanceBadge) balanceBadge.classList.remove('revalidating');
+              if (currentActiveSegment === 'logs') renderLogsList();
+            };
+            scriptEl.src = WEB_APP_URL + '?action=getLabourData&callback=' + cbName;
+            document.body.appendChild(scriptEl);
+          });
+      } catch (e) {
+        clearTimeout(skeletonTimer);
+        showLogsSkeleton = false;
+        if (balanceBadge) balanceBadge.classList.remove('revalidating');
+      }
+    }
+
+    function getCommandCatalog() {
+      var cmds = [
+        { title: 'Switch to Labour Tab', sub: 'Navigation', shortcut: '1', action: function() { switchDockTab('labour'); } },
+        { title: 'Switch to Harvest Tab', sub: 'Navigation', shortcut: '2', action: function() { switchDockTab('harvest'); } },
+        { title: 'Switch to Sale Tab', sub: 'Navigation', shortcut: '3', action: function() { switchDockTab('sale'); } },
+        { title: 'Open Entry Form', sub: 'View', shortcut: 'E', action: function() { switchViewSegment('form'); } },
+        { title: 'Open Logs Feed', sub: 'View', shortcut: 'L', action: function() { switchViewSegment('logs'); } },
+        { title: 'Toggle Day Off Mode', sub: 'Quick Action', shortcut: 'D', action: function() { switchDockTab('labour'); switchViewSegment('form'); toggleDayOffMode(); } },
+        { title: 'Log Cash Advance', sub: 'Quick Action', shortcut: 'A', action: function() { triggerFabAction('advance'); } },
+        { title: 'Log Alcohol Draw', sub: 'Quick Action', shortcut: 'W', action: function() { triggerFabAction('alcohol'); } },
+        { title: 'Log Maintenance', sub: 'Quick Action', shortcut: 'M', action: function() { openModal('maintenanceModal'); } },
+        { title: 'Open Operations Calendar', sub: 'Filter & Dates', shortcut: 'C', action: function() { openCalendarModal(); } },
+        { title: 'Open Worker Profile & Ledger', sub: currentActiveWorker, shortcut: 'P', action: function() { openWorkerProfileModal(); } },
+        { title: 'Send WhatsApp Statement', sub: currentActiveWorker, shortcut: '', action: function() { openWhatsAppModal(); } },
+        { title: 'Open UPI Payment', sub: currentActiveWorker, shortcut: 'U', action: function() { openUpiModal(); } },
+        { title: 'Open Weighing Scale', sub: 'Harvest & Sale', shortcut: 'S', action: function() { openModal('weighingScaleModal'); } },
+        { title: 'Analytics: Complete Worker Summary', sub: 'Explorer', shortcut: '', action: function() { openHamburgerLogCategory('all'); } },
+        { title: 'Analytics: Alcohol Borrowed', sub: 'Explorer', shortcut: '', action: function() { openHamburgerLogCategory('alcohol'); } },
+        { title: 'Analytics: Cash & Grocery', sub: 'Explorer', shortcut: '', action: function() { openHamburgerLogCategory('grocery'); } },
+        { title: 'Toggle Day / Night Theme', sub: 'Appearance', shortcut: 'T', action: function() { toggleDayNightTheme(); } },
+        { title: 'Sync Google Sheet Now', sub: 'Cloud', shortcut: 'R', action: function() { spinEmblemAndSync(); } }
+      ];
+
+      var workerNames = getWorkerList();
+      for (var i = 0; i < workerNames.length; i++) {
+        (function(wName) {
+          cmds.push({
+            title: 'Select Worker: ' + wName,
+            sub: 'Active Profile',
+            shortcut: '',
+            action: function() { selectActiveWorker(wName); }
+          });
+        })(workerNames[i]);
+      }
+      return cmds;
+    }
+
+    function openCommandMenu() {
+      openModal('commandMenuModal');
+      var input = document.getElementById('cmdSearchInput');
+      if (input) {
+        input.value = '';
+        filterCommandMenu('');
+        setTimeout(function() { input.focus(); }, 40);
+      }
+    }
+
+    function filterCommandMenu(query) {
+      var q = String(query || '').trim().toLowerCase();
+      var all = getCommandCatalog();
+      cmdFilteredItems = [];
+      for (var i = 0; i < all.length; i++) {
+        if (!q || all[i].title.toLowerCase().indexOf(q) !== -1 || all[i].sub.toLowerCase().indexOf(q) !== -1) {
+          cmdFilteredItems.push(all[i]);
+        }
+      }
+      cmdSelectedIndex = 0;
+      renderCommandMenuItems();
+    }
+
+    function renderCommandMenuItems() {
+      var container = document.getElementById('cmdMenuResults');
+      if (!container) return;
+      if (cmdFilteredItems.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:18px; font-size:12.5px; color:var(--text-secondary);">No matching commands</div>';
+        return;
+      }
+      var html = '';
+      for (var i = 0; i < cmdFilteredItems.length; i++) {
+        var item = cmdFilteredItems[i];
+        var kbd = item.shortcut ? ('<kbd class="kbd-hint">' + item.shortcut + '</kbd>') : '';
+        html += '<button type="button" class="cmd-item ' + (i === cmdSelectedIndex ? 'active' : '') + '" onclick="executeCommandItem(' + i + ')">' +
+          '<div><span>' + item.title + '</span><span class="cmd-item-sub">' + item.sub + '</span></div>' +
+          kbd +
+        '</button>';
+      }
+      container.innerHTML = html;
+    }
+
+    function executeCommandItem(idx) {
+      var item = cmdFilteredItems[idx];
+      if (!item) return;
+      closeModal('commandMenuModal');
+      item.action();
+    }
+
+    function decorateShortcutHints() {
+      var cmdBtn = document.getElementById('cmdMenuTopBtn');
+      if (cmdBtn) cmdBtn.title = 'Command Menu (' + modKeySymbol + 'K)';
+
+      var segForm = document.getElementById('segBtnForm');
+      var segLogs = document.getElementById('segBtnLogs');
+      if (segForm && !segForm.querySelector('.kbd-hint')) {
+        segForm.insertAdjacentHTML('beforeend', '<kbd class="kbd-hint">E</kbd>');
+      }
+      if (segLogs && !segLogs.querySelector('.kbd-hint')) {
+        segLogs.insertAdjacentHTML('beforeend', '<kbd class="kbd-hint">L</kbd>');
+      }
+    }
+
+    function setupKeyboardShortcuts() {
+      document.addEventListener('keydown', function(e) {
+        var key = e.key || '';
+        var isCmdK = (e.metaKey || e.ctrlKey) && key.toLowerCase() === 'k';
+        if (isCmdK) {
+          e.preventDefault();
+          var cmdModal = document.getElementById('commandMenuModal');
+          if (cmdModal && cmdModal.classList.contains('open')) {
+            closeModal('commandMenuModal');
+          } else {
+            openCommandMenu();
+          }
+          return;
+        }
+
+        var cmdModalOpen = document.getElementById('commandMenuModal') && document.getElementById('commandMenuModal').classList.contains('open');
+        if (cmdModalOpen) {
+          if (key === 'ArrowDown') {
+            e.preventDefault();
+            if (cmdFilteredItems.length > 0) {
+              cmdSelectedIndex = (cmdSelectedIndex + 1) % cmdFilteredItems.length;
+              renderCommandMenuItems();
+            }
+            return;
+          } else if (key === 'ArrowUp') {
+            e.preventDefault();
+            if (cmdFilteredItems.length > 0) {
+              cmdSelectedIndex = (cmdSelectedIndex - 1 + cmdFilteredItems.length) % cmdFilteredItems.length;
+              renderCommandMenuItems();
+            }
+            return;
+          } else if (key === 'Enter') {
+            e.preventDefault();
+            executeCommandItem(cmdSelectedIndex);
+            return;
+          } else if (key === 'Escape') {
+            e.preventDefault();
+            closeModal('commandMenuModal');
+            return;
+          }
+        }
+
+        if (key === 'Escape') {
+          var openModals = document.querySelectorAll('.modal-overlay.open');
+          for (var m = 0; m < openModals.length; m++) {
+            openModals[m].classList.remove('open');
+          }
+          closeFabMenu();
+          return;
+        }
+
+        var target = e.target;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable)) {
+          return;
+        }
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+        var lower = key.toLowerCase();
+        if (lower === '1') switchDockTab('labour');
+        else if (lower === '2') switchDockTab('harvest');
+        else if (lower === '3') switchDockTab('sale');
+        else if (lower === 'e') switchViewSegment('form');
+        else if (lower === 'l') switchViewSegment('logs');
+        else if (lower === 'd') { switchDockTab('labour'); switchViewSegment('form'); toggleDayOffMode(); }
+        else if (lower === 'c') openCalendarModal();
+        else if (lower === 'm') openModal('maintenanceModal');
+        else if (lower === 'p') openWorkerProfileModal();
+        else if (lower === 't') toggleDayNightTheme();
+        else if (lower === 'z' && pendingSoftDelete) undoLastSoftDelete();
+      });
+    }
+
+    function setupSwipeToDismissSheets() {
+      var sheets = document.querySelectorAll('.modal-sheet');
+      for (var i = 0; i < sheets.length; i++) {
+        (function(sheet) {
+          if (!sheet.querySelector('.sheet-drag-handle')) {
+            var handle = document.createElement('div');
+            handle.className = 'sheet-drag-handle';
+            sheet.insertBefore(handle, sheet.firstChild);
+          }
+
+          var startY = 0;
+          var currentY = 0;
+          var startTime = 0;
+          var isDragging = false;
+
+          sheet.addEventListener('touchstart', function(ev) {
+            if (!ev.touches || !ev.touches[0]) return;
+            if (sheet.scrollTop > 4 && ev.target.className !== 'sheet-drag-handle') return;
+            startY = ev.touches[0].clientY;
+            currentY = startY;
+            startTime = Date.now();
+            isDragging = true;
+            sheet.style.transition = 'none';
+          }, { passive: true });
+
+          sheet.addEventListener('touchmove', function(ev) {
+            if (!isDragging || !ev.touches || !ev.touches[0]) return;
+            currentY = ev.touches[0].clientY;
+            var deltaY = currentY - startY;
+            if (deltaY > 0) {
+              sheet.style.transform = 'translateY(' + deltaY + 'px)';
+              sheet.style.opacity = String(Math.max(0.4, 1 - deltaY / 380));
+            }
+          }, { passive: true });
+
+          sheet.addEventListener('touchend', function() {
+            if (!isDragging) return;
+            isDragging = false;
+            var deltaY = currentY - startY;
+            var elapsed = Math.max(1, Date.now() - startTime);
+            var velocity = deltaY / elapsed;
+
+            sheet.style.transition = 'transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s cubic-bezier(0.22, 1, 0.36, 1)';
+            if (deltaY > 110 || (deltaY > 35 && velocity > 0.55)) {
+              sheet.style.transform = 'translateY(100%)';
+              sheet.style.opacity = '0';
+              var overlay = sheet.closest('.modal-overlay');
+              setTimeout(function() {
+                if (overlay) overlay.classList.remove('open');
+                sheet.style.transform = '';
+                sheet.style.opacity = '';
+              }, 190);
+            } else {
+              sheet.style.transform = '';
+              sheet.style.opacity = '';
+            }
+          }, { passive: true });
+        })(sheets[i]);
+      }
+    }
+
+    function setupStaleWhileRevalidate() {
+      window.addEventListener('focus', function() {
+        fetchRemoteSheetData(true);
+      });
+      window.addEventListener('online', function() {
+        fetchRemoteSheetData(true);
+        showToast('Back online — syncing latest logs');
+      });
+    }
+
+    function setupIosPwaAssets() {
+      try {
+        var canvas = document.createElement('canvas');
+        canvas.width = 180;
+        canvas.height = 180;
+        var ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Warm peach squircle background
+        ctx.fillStyle = '#f3c58b';
+        ctx.beginPath();
+        ctx.roundRect ? ctx.roundRect(0, 0, 180, 180, 40) : ctx.rect(0, 0, 180, 180);
+        ctx.fill();
+
+        // Inner dark indigo circle
+        ctx.fillStyle = '#433863';
+        ctx.beginPath();
+        ctx.arc(90, 90, 56, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Starburst spokes
+        ctx.strokeStyle = '#f3c58b';
+        ctx.lineWidth = 10;
+        ctx.lineCap = 'round';
+        var lines = [
+          [90, 48, 90, 132],
+          [48, 90, 132, 90],
+          [60, 60, 120, 120],
+          [120, 60, 60, 120]
+        ];
+        for (var i = 0; i < lines.length; i++) {
+          ctx.beginPath();
+          ctx.moveTo(lines[i][0], lines[i][1]);
+          ctx.lineTo(lines[i][2], lines[i][3]);
+          ctx.stroke();
+        }
+
+        // Center coral dot
+        ctx.fillStyle = '#f59d8d';
+        ctx.beginPath();
+        ctx.arc(90, 90, 15, 0, Math.PI * 2);
+        ctx.fill();
+
+        var iconDataUrl = canvas.toDataURL('image/png');
+        var touchLink = document.getElementById('appleTouchIconLink');
+        var favLink = document.getElementById('favIconLink');
+        if (touchLink) touchLink.href = iconDataUrl;
+        if (favLink) favLink.href = iconDataUrl;
+
+        var manifest = {
+          name: 'Chelavara Estate Logger',
+          short_name: 'Chelavara',
+          description: 'Chelavara Plantation Daily Operations & Labour Logger',
+          start_url: './index.html',
+          display: 'standalone',
+          orientation: 'portrait',
+          background_color: '#433863',
+          theme_color: '#433863',
+          icons: [
+            { src: iconDataUrl, sizes: '180x180', type: 'image/png', purpose: 'any maskable' }
+          ]
+        };
+        var manifestLink = document.getElementById('pwaManifestLink');
+        if (manifestLink) {
+          manifestLink.href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
+        }
+      } catch (e) {}
+    }
+
+    function initApp() {
+      setupIosPwaAssets();
+      var todayStr = getFormattedCurrentDate();
+      selectedCalendarDate = todayStr;
+      var dateInput = document.getElementById('inputDate');
+      if (dateInput) dateInput.value = todayStr;
+
+      try {
+        var cachedProfiles = safeStorage.getItem('chelavara_profiles');
+        if (cachedProfiles) {
+          var parsed = JSON.parse(cachedProfiles);
+          if (parsed && typeof parsed === 'object') {
+            delete parsed.Chandru;
+            delete parsed.Ravi;
+            delete parsed.Manju;
+            delete parsed.Somanna;
+            var k = Object.keys(parsed);
+            for (var i = 0; i < k.length; i++) {
+              workerProfiles[k[i]] = parsed[k[i]];
+            }
+          }
+        }
+      } catch (e) {}
+
+      try {
+        var cachedLogs = safeStorage.getItem('chelavara_logs');
+        if (cachedLogs) {
+          var parsedLogs = JSON.parse(cachedLogs);
+          if (Array.isArray(parsedLogs) && parsedLogs.length > 0) sheetRows = parsedLogs;
+        }
+      } catch (e) {}
+
+      populateWorkerSelectors();
+      switchDockTab('labour');
+      recalculateAggregates();
+      renderScaleReadout();
+      renderCalendar();
+      decorateShortcutHints();
+      setupKeyboardShortcuts();
+      setupSwipeToDismissSheets();
+      setupStaleWhileRevalidate();
+      fetchRemoteSheetData(false);
+    }
+
+    initApp();
+  </script>
+</body>
+</html>
