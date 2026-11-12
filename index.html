@@ -1519,6 +1519,279 @@
     .invoice-row strong { font-weight: 800; font-family: var(--font-mono); }
     .invoice-total-box { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; font-size: 16px; font-weight: 800; }
 
+    /* Receipt Printer Hardware & Stepped Feed Animation */
+    .printer-root {
+      position: relative;
+      isolation: isolate;
+      display: flex;
+      width: 100%;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .printer-filter-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 4px;
+      margin-bottom: 12px;
+    }
+
+    .printer-filter-btn {
+      min-height: 38px;
+      border: none;
+      border-radius: var(--radius-full);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .printer-filter-btn.active {
+      background: var(--card-peach);
+      color: var(--ink-dark);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    }
+
+    .printer-machine {
+      position: relative;
+      isolation: isolate;
+      width: 100%;
+      overflow: hidden;
+      border-radius: 24px;
+      corner-shape: squircle;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: linear-gradient(180deg, #2b2243 0%, #1d1630 100%);
+      padding: 12px 12px 28px 12px;
+      box-shadow:
+        0 20px 36px -20px rgba(0, 0, 0, 0.65),
+        0 6px 14px -8px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.14),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.55);
+    }
+
+    .printer-header {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      height: 36px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px;
+      margin-bottom: 6px;
+    }
+
+    .printer-brand-tag {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--card-peach);
+      font-family: var(--font-mono);
+    }
+
+    .printer-screen {
+      position: relative;
+      z-index: 10;
+      isolation: isolate;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px solid rgba(0, 0, 0, 0.65);
+      background: #140f23;
+      padding: 12px 14px;
+      color: #fdfaf6;
+      box-shadow: inset 0 0 20px 3px rgba(0, 0, 0, 0.65);
+    }
+
+    .printer-status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .printer-status-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .printer-status-icon {
+      width: 18px;
+      height: 18px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    @keyframes printerSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    .printer-spinner {
+      animation: printerSpin 0.85s linear infinite;
+      color: var(--card-peach);
+    }
+
+    .printer-check {
+      color: var(--accent-positive);
+    }
+
+    .printer-status-text {
+      font-size: 12px;
+      font-weight: 700;
+      color: #e2dcf5;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: transform 0.18s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.18s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .printer-slot {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      bottom: 10px;
+      z-index: 40;
+      height: 8px;
+      border-radius: 4px;
+      border: 1px solid #090612;
+      background: #090612;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
+    }
+
+    .printer-output-viewport {
+      position: relative;
+      z-index: 50;
+      margin-top: -14px;
+      width: calc(100% - 16px);
+      max-height: 360px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 0 8px 14px 8px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .printer-slot-shadow {
+      pointer-events: none;
+      position: sticky;
+      top: 0;
+      left: 8px;
+      right: 8px;
+      z-index: 25;
+      height: 8px;
+      background: rgba(9, 6, 18, 0.78);
+      filter: blur(5px);
+    }
+
+    .printer-paper-mover {
+      position: relative;
+      isolation: isolate;
+      transform: translateY(calc(-100% + 2px));
+      opacity: 0;
+      will-change: transform, opacity;
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.38));
+    }
+
+    .printer-paper-mover.stage-processing {
+      opacity: 0;
+      transform: translateY(calc(-100% + 2px));
+    }
+
+    .printer-paper-mover.stage-printing {
+      opacity: 1;
+      animation: steppedReceiptFeed 1.75s linear forwards;
+    }
+
+    .printer-paper-mover.stage-complete {
+      opacity: 1;
+      transform: translateY(0%);
+      transition: opacity 0.16s cubic-bezier(0.23, 1, 0.32, 1), transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    @keyframes steppedReceiptFeed {
+      0%     { transform: translateY(calc(-100% + 2px)); }
+      7.5%   { transform: translateY(-91%); }
+      10.5%  { transform: translateY(-91%); }
+      18%    { transform: translateY(-81%); }
+      21%    { transform: translateY(-81%); }
+      28.5%  { transform: translateY(-70%); }
+      31.5%  { transform: translateY(-70%); }
+      39%    { transform: translateY(-58%); }
+      42%    { transform: translateY(-58%); }
+      49.5%  { transform: translateY(-45%); }
+      52.5%  { transform: translateY(-45%); }
+      60%    { transform: translateY(-32%); }
+      63%    { transform: translateY(-32%); }
+      70.5%  { transform: translateY(-20%); }
+      73.5%  { transform: translateY(-20%); }
+      81%    { transform: translateY(-10%); }
+      84%    { transform: translateY(-10%); }
+      91.5%  { transform: translateY(-3%); }
+      94.5%  { transform: translateY(-3%); }
+      100%   { transform: translateY(0%); }
+    }
+
+    .printer-paper {
+      position: relative;
+      z-index: 10;
+      min-height: 250px;
+      background-color: #fdfaf6;
+      background-image: radial-gradient(rgba(45, 36, 71, 0.04) 1px, transparent 0);
+      background-size: 12px 12px;
+      color: #1e1830;
+      font-family: var(--font-mono);
+      padding: 22px 18px 28px 18px;
+      border-radius: 3px 3px 0 0;
+    }
+
+    .printer-paper .invoice-header {
+      border-bottom: 1.5px dashed rgba(30, 24, 48, 0.28);
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+    }
+
+    .printer-paper .invoice-logo {
+      color: #1e1830;
+      font-family: var(--font-mono);
+      letter-spacing: -0.02em;
+    }
+
+    .printer-paper .invoice-total-box {
+      border-top: 1.5px dashed rgba(30, 24, 48, 0.28);
+      color: #1e1830;
+    }
+
+    @media print {
+      .printer-machine,
+      .printer-filter-bar,
+      .printer-slot-shadow {
+        display: none !important;
+      }
+      .printer-output-viewport {
+        max-height: none !important;
+        overflow: visible !important;
+        width: 100% !important;
+        margin: 0 !important;
+      }
+      .printer-paper-mover {
+        transform: none !important;
+        opacity: 1 !important;
+        animation: none !important;
+        filter: none !important;
+      }
+      .printer-paper {
+        clip-path: none !important;
+      }
+    }
+
     @media (pointer: coarse) {
       .icon-action-btn,
       .strip-mini-btn,
@@ -2357,14 +2630,55 @@
     </div>
   </div>
   
-  <!-- 14. Log Invoice / Receipt Share Modal -->
+  <!-- 14. Receipt Printer Log Share Modal -->
   <div class="modal-overlay" id="invoiceShareModal" onclick="handleOverlayClick(event, 'invoiceShareModal')">
-    <div class="modal-sheet" style="padding: 16px;">
-      <button type="button" class="modal-close-btn print-hide" onclick="closeModal('invoiceShareModal')" style="position:absolute; right:16px; top:16px; width:36px; height:36px; min-width:36px; min-height:36px; font-size:12px; z-index:10;">✕</button>
-      <div class="invoice-card" id="invoiceCardContent">
-         <!-- Content injected via JS -->
+    <div class="modal-sheet" style="padding: 14px 16px 18px 16px;">
+      <div class="modal-header print-hide" style="margin-bottom:2px;">
+        <div class="modal-title-group">
+          <h2>Share Log Receipt</h2>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeModal('invoiceShareModal')">✕</button>
       </div>
-      <div class="form-row-2 print-hide" style="margin-top: 12px; margin-bottom:0;">
+
+      <!-- Filter Selector: Selected | This Month | Select All -->
+      <div class="printer-filter-bar print-hide" role="tablist" aria-label="Receipt Filter Scope">
+        <button type="button" class="printer-filter-btn active" id="printerFilterSelectedBtn" onclick="switchReceiptFilterMode('selected')">Selected (1)</button>
+        <button type="button" class="printer-filter-btn" id="printerFilterMonthBtn" onclick="switchReceiptFilterMode('month')">This Month</button>
+        <button type="button" class="printer-filter-btn" id="printerFilterAllBtn" onclick="switchReceiptFilterMode('all')">Select All</button>
+      </div>
+
+      <!-- ReceiptPrinter.Root -->
+      <section class="printer-root" id="receiptPrinterRoot" data-stage="processing" aria-label="Receipt printer">
+        <!-- ReceiptPrinter.Machine -->
+        <div class="printer-machine">
+          <div class="printer-header">
+            <span class="printer-brand-tag">CHELAVARA POS-80</span>
+            <span style="font-size:10.5px; font-weight:700; color:var(--text-secondary); font-family:var(--font-mono);" id="printerCountBadge">0 LOGS</span>
+          </div>
+          <!-- ReceiptPrinter.Screen -->
+          <div class="printer-screen">
+            <div class="printer-status-row">
+              <div class="printer-status-left">
+                <span class="printer-status-icon" id="printerStatusIcon"></span>
+                <div role="status" aria-live="polite" class="printer-status-text" id="printerStatusLabel">Compiling estate logs...</div>
+              </div>
+              <button type="button" class="dayoff-toggle-btn" style="min-height:28px; padding:0 10px; font-size:10.5px;" onclick="replayReceiptPrinterAnimation()">Reprint</button>
+            </div>
+          </div>
+          <div aria-hidden="true" class="printer-slot"></div>
+        </div>
+
+        <!-- ReceiptPrinter.Output -->
+        <div class="printer-output-viewport" id="printerOutputViewport">
+          <div aria-hidden="true" class="printer-slot-shadow"></div>
+          <div class="printer-paper-mover stage-processing" id="printerPaperMover">
+            <!-- ReceiptPrinter.Paper -->
+            <article class="printer-paper invoice-card" id="invoiceCardContent"></article>
+          </div>
+        </div>
+      </section>
+
+      <div class="form-row-2 print-hide" style="margin-top: 4px; margin-bottom:0;">
         <button type="button" class="primary-btn secondary-btn" onclick="window.print()">Print / PDF</button>
         <button type="button" class="primary-btn" onclick="shareInvoiceData()">Share Receipt</button>
       </div>
@@ -2427,6 +2741,22 @@
     // Selection state variables
     var isSelectionMode = false;
     var selectedLogIds = [];
+    var receiptInitialSelectedIds = [];
+    var currentReceiptFilterMode = 'selected';
+    var receiptStageTimer1 = null;
+    var receiptStageTimer2 = null;
+
+    var RECEIPT_CLIP_PATH = (function() {
+      var toothCount = 40;
+      var toothDepth = 4;
+      var pts = [];
+      for (var i = 0; i < toothCount * 2; i++) {
+        var x = (100 - ((i + 1) * 100) / (toothCount * 2)).toFixed(2);
+        var y = (i % 2 === 0) ? '100%' : 'calc(100% - ' + toothDepth + 'px)';
+        pts.push(x + '% ' + y);
+      }
+      return 'polygon(0 0, 100% 0, 100% calc(100% - ' + toothDepth + 'px), ' + pts.join(', ') + ')';
+    })();
 
     var isMacPlatform = /Mac|iPhone|iPad|iPod/i.test((navigator.platform || '') + ' ' + (navigator.userAgent || ''));
     var modKeySymbol = isMacPlatform ? '⌘' : 'Ctrl+';
@@ -3194,8 +3524,9 @@
     
     function shareSelectedLogs() {
       if (selectedLogIds.length > 0) {
-        openInvoiceShareModal(selectedLogIds);
+        var idsToShare = selectedLogIds.slice();
         cancelLogSelection();
+        openInvoiceShareModal(idsToShare, 'selected');
       }
     }
 
@@ -4172,83 +4503,191 @@
       if (nameInp) nameInp.value = '';
       showToast('Added ' + name);
     }
-    
-    function openInvoiceShareModal(rowIndices) {
-      if(!rowIndices || rowIndices.length === 0) return;
-      var items = [];
-      var totalCost = 0;
-      var totalAdv = 0;
-      var totalGroc = 0;
-      var totalAlc = 0;
-      
+
+    function setReceiptPrinterStage(stage) {
+      var root = document.getElementById('receiptPrinterRoot');
+      var mover = document.getElementById('printerPaperMover');
+      var iconEl = document.getElementById('printerStatusIcon');
+      var labelEl = document.getElementById('printerStatusLabel');
+
+      if (root) root.setAttribute('data-stage', stage);
+      if (mover) {
+        mover.className = 'printer-paper-mover stage-' + stage;
+      }
+
+      var spinnerSvg = '<svg class="printer-spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>';
+      var checkSvg = '<svg class="printer-check" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>';
+
+      if (stage === 'processing') {
+        if (iconEl) iconEl.innerHTML = spinnerSvg;
+        if (labelEl) labelEl.textContent = 'Processing log entries...';
+      } else if (stage === 'printing') {
+        if (iconEl) iconEl.innerHTML = spinnerSvg;
+        if (labelEl) labelEl.textContent = 'Printing thermal receipt...';
+      } else {
+        if (iconEl) iconEl.innerHTML = checkSvg;
+        if (labelEl) labelEl.textContent = 'Receipt ready to share';
+      }
+    }
+
+    function replayReceiptPrinterAnimation() {
+      clearTimeout(receiptStageTimer1);
+      clearTimeout(receiptStageTimer2);
+
+      var viewport = document.getElementById('printerOutputViewport');
+      if (viewport) viewport.scrollTop = 0;
+
+      if (prefersReducedMotion()) {
+        setReceiptPrinterStage('complete');
+        return;
+      }
+
+      setReceiptPrinterStage('processing');
+      receiptStageTimer1 = setTimeout(function() {
+        setReceiptPrinterStage('printing');
+        receiptStageTimer2 = setTimeout(function() {
+          setReceiptPrinterStage('complete');
+        }, 1750);
+      }, 240);
+    }
+
+    function getRowsForReceiptFilter(mode) {
+      var tabRows = getFilteredRowsForCurrentTab();
+      if (mode === 'all') {
+        return tabRows;
+      }
+      if (mode === 'month') {
+        var nowMonth = getFormattedCurrentDate().slice(0, 7);
+        var monthMatches = [];
+        for (var m = 0; m < tabRows.length; m++) {
+          var d = String(getRowData(tabRows[m])[0] || '');
+          if (d.indexOf(nowMonth) === 0) monthMatches.push(tabRows[m]);
+        }
+        if (monthMatches.length === 0 && tabRows.length > 0) {
+          var latestPrefix = String(getRowData(tabRows[0])[0] || '').slice(0, 7);
+          for (var k = 0; k < tabRows.length; k++) {
+            var dk = String(getRowData(tabRows[k])[0] || '');
+            if (dk.indexOf(latestPrefix) === 0) monthMatches.push(tabRows[k]);
+          }
+        }
+        return monthMatches;
+      }
+      var selMatches = [];
       for (var i = 0; i < sheetRows.length; i++) {
-        if (rowIndices.indexOf(sheetRows[i].rowIndex_) !== -1) {
-          items.push(sheetRows[i]);
+        if (receiptInitialSelectedIds.indexOf(sheetRows[i].rowIndex_) !== -1) {
+          selMatches.push(sheetRows[i]);
         }
       }
-      if (items.length === 0) return;
-      
+      return selMatches.length > 0 ? selMatches : tabRows.slice(0, 1);
+    }
+
+    function switchReceiptFilterMode(mode) {
+      currentReceiptFilterMode = mode || 'selected';
+      var btnSel = document.getElementById('printerFilterSelectedBtn');
+      var btnMon = document.getElementById('printerFilterMonthBtn');
+      var btnAll = document.getElementById('printerFilterAllBtn');
+
+      if (btnSel) {
+        btnSel.classList.toggle('active', currentReceiptFilterMode === 'selected');
+        btnSel.textContent = 'Selected (' + (receiptInitialSelectedIds.length || 1) + ')';
+      }
+      if (btnMon) btnMon.classList.toggle('active', currentReceiptFilterMode === 'month');
+      if (btnAll) btnAll.classList.toggle('active', currentReceiptFilterMode === 'all');
+
+      renderReceiptPaperContent();
+      replayReceiptPrinterAnimation();
+    }
+
+    function renderReceiptPaperContent() {
+      var items = getRowsForReceiptFilter(currentReceiptFilterMode);
+      var container = document.getElementById('invoiceCardContent');
+      var countBadge = document.getElementById('printerCountBadge');
+      if (!container) return;
+
+      container.style.clipPath = RECEIPT_CLIP_PATH;
+      if (countBadge) countBadge.textContent = items.length + (items.length === 1 ? ' LOG' : ' LOGS');
+
+      if (items.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:32px 12px; font-size:12px;">No logs found for this filter.</div>';
+        return;
+      }
+
+      var totalCost = 0, totalAdv = 0, totalGroc = 0, totalAlc = 0;
       var workerSet = {};
       var dateRange = [null, null];
       var listHtml = '';
-      
-      for(var k=0; k<items.length; k++) {
+
+      for (var k = 0; k < items.length; k++) {
         var r = getRowData(items[k]);
         var cost = parseFloat(r[8]) || 0;
         var adv = parseFloat(r[9]) || 0;
         var groc = parseFloat(r[10]) || 0;
         var alc = parseFloat(r[11]) || 0;
-        totalCost += cost; totalAdv += adv; totalGroc += groc; totalAlc += alc;
-        workerSet[String(r[4]||'')] = true;
-        
-        var date = r[0];
-        if(!dateRange[0] || date < dateRange[0]) dateRange[0] = date;
-        if(!dateRange[1] || date > dateRange[1]) dateRange[1] = date;
-        
-        listHtml += '<div style="font-size:11px; padding:6px 0; border-bottom:1px solid var(--border-subtle);">' +
-          '<div style="display:flex; justify-content:space-between; margin-bottom:2px;"><strong style="font-size:12px;">' + r[3] + '</strong><strong style="font-family:var(--font-mono);">' + formatINR(cost > 0 ? cost : -(adv+groc+alc)) + '</strong></div>' +
-          '<div style="color:var(--text-secondary);">' + r[0] + ' • ' + r[4] + ' • ' + r[5] + ' ' + r[6] + '</div>' +
+        totalCost += cost;
+        totalAdv += adv;
+        totalGroc += groc;
+        totalAlc += alc;
+        workerSet[String(r[4] || '')] = true;
+
+        var date = String(r[0] || '');
+        if (!dateRange[0] || date < dateRange[0]) dateRange[0] = date;
+        if (!dateRange[1] || date > dateRange[1]) dateRange[1] = date;
+
+        var lineAmt = cost > 0 ? formatINR(cost) : formatINR(-(adv + groc + alc));
+        listHtml += '<div style="font-size:11px; padding:6px 0; border-bottom:1px dashed rgba(30,24,48,0.18);">' +
+          '<div style="display:flex; justify-content:space-between; margin-bottom:2px;"><strong style="font-size:11.5px; color:#1e1830;">' + (r[3] || 'Entry') + '</strong><strong style="color:#1e1830;">' + lineAmt + '</strong></div>' +
+          '<div style="color:#595075; font-size:10px;">' + date + ' • ' + r[4] + ' • ' + r[2] + ' • ' + r[5] + ' ' + r[6] + '</div>' +
         '</div>';
       }
-      
-      var workersArr = Object.keys(workerSet);
-      var workerStr = workersArr.length > 2 ? workersArr.length + ' Workers' : workersArr.join(', ');
-      var dateStr = (dateRange[0] === dateRange[1]) ? dateRange[0] : (dateRange[0] + ' to ' + dateRange[1]);
+
+      var workersArr = Object.keys(workerSet).filter(Boolean);
+      var workerStr = workersArr.length > 2 ? (workersArr.length + ' Workers') : (workersArr.join(', ') || currentActiveWorker);
+      var dateStr = (dateRange[0] === dateRange[1]) ? dateRange[0] : (dateRange[0] + ' → ' + dateRange[1]);
       var totalDrawn = totalAdv + totalGroc + totalAlc;
       var net = totalCost - totalDrawn;
-      var status = net < 0 ? 'Advance Paid' : 'Settled';
-      
-      var html = '<div class="invoice-header">' +
-        '<div>' +
-          '<div class="invoice-logo">Chelavara Estate</div>' +
-          '<div style="font-size:10.5px; color:var(--text-secondary); margin-top:4px;">Invoice / Log Summary • ' + dateStr + '</div>' +
-        '</div>' +
-        '<div><span class="invoice-status-pill">' + status + '</span></div>' +
-      '</div>' +
-      '<div style="margin-bottom:16px;">' +
-        '<div style="font-size:11px; font-weight:800; color:var(--text-secondary); text-transform:uppercase; margin-bottom:4px;">Entity Details</div>' +
-        '<div style="font-size:14px; font-weight:800;">' + workerStr + '</div>' +
-        '<div style="font-size:12px; color:var(--text-secondary);">' + items.length + ' Log Entries Included</div>' +
-      '</div>' +
-      '<div style="margin-bottom:16px;">' +
-        '<div style="font-size:11px; font-weight:800; color:var(--text-secondary); text-transform:uppercase; margin-bottom:4px;">Entries Breakdown</div>' +
-        listHtml +
-      '</div>' +
-      '<div>' +
-        '<div style="font-size:11px; font-weight:800; color:var(--text-secondary); text-transform:uppercase; margin-bottom:8px;">Aggregate Breakdown</div>' +
-        (totalCost > 0 ? '<div class="invoice-row"><span>Total Base Wage</span><strong>' + formatINR(totalCost) + '</strong></div>' : '') +
-        (totalAdv > 0 ? '<div class="invoice-row"><span>Total Cash Advance</span><strong style="color:var(--accent-danger);">-' + formatINR(totalAdv) + '</strong></div>' : '') +
-        (totalGroc > 0 ? '<div class="invoice-row"><span>Total Grocery Draw</span><strong style="color:var(--accent-danger);">-' + formatINR(totalGroc) + '</strong></div>' : '') +
-        (totalAlc > 0 ? '<div class="invoice-row"><span>Total Alcohol Draw</span><strong style="color:var(--accent-danger);">-' + formatINR(totalAlc) + '</strong></div>' : '') +
-      '</div>' +
-      '<div class="invoice-total-box">' +
-        '<span>Net Payout</span>' +
-        '<span>' + formatINR(net) + '</span>' +
-      '</div>';
+      var status = net < 0 ? 'Advance Due' : 'Settled';
+      var scopeTitle = currentReceiptFilterMode === 'all' ? 'ALL LOGS STATEMENT' : (currentReceiptFilterMode === 'month' ? 'MONTHLY STATEMENT' : 'SELECTED LOG RECEIPT');
 
-      var container = document.getElementById('invoiceCardContent');
-      if(container) container.innerHTML = html;
+      container.innerHTML =
+        '<div class="invoice-header">' +
+          '<div>' +
+            '<div class="invoice-logo">CHELAVARA ESTATE</div>' +
+            '<div style="font-size:10px; color:#595075; margin-top:2px;">' + scopeTitle + '</div>' +
+            '<div style="font-size:10px; color:#595075;">' + dateStr + '</div>' +
+          '</div>' +
+          '<div><span class="invoice-status-pill">' + status + '</span></div>' +
+        '</div>' +
+        '<div style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:baseline;">' +
+          '<div>' +
+            '<div style="font-size:9.5px; font-weight:800; color:#595075; text-transform:uppercase;">Account / Entity</div>' +
+            '<div style="font-size:13.5px; font-weight:800; color:#1e1830;">' + workerStr + '</div>' +
+          '</div>' +
+          '<div style="font-size:10.5px; font-weight:700; color:#595075;">' + items.length + ' entries</div>' +
+        '</div>' +
+        '<div style="margin-bottom:12px;">' +
+          listHtml +
+        '</div>' +
+        '<div>' +
+          (totalCost > 0 ? '<div class="invoice-row" style="color:#1e1830;"><span>Earned / Total</span><strong>' + formatINR(totalCost) + '</strong></div>' : '') +
+          (totalAdv > 0 ? '<div class="invoice-row" style="color:#b91c1c;"><span>Cash Advance</span><strong>-' + formatINR(totalAdv) + '</strong></div>' : '') +
+          (totalGroc > 0 ? '<div class="invoice-row" style="color:#b91c1c;"><span>Grocery Draw</span><strong>-' + formatINR(totalGroc) + '</strong></div>' : '') +
+          (totalAlc > 0 ? '<div class="invoice-row" style="color:#b91c1c;"><span>Alcohol Draw</span><strong>-' + formatINR(totalAlc) + '</strong></div>' : '') +
+        '</div>' +
+        '<div class="invoice-total-box">' +
+          '<span>NET BALANCE</span>' +
+          '<span>' + formatINR(net) + '</span>' +
+        '</div>';
+    }
+
+    function openInvoiceShareModal(rowIndices, defaultFilterMode) {
+      if (Array.isArray(rowIndices) && rowIndices.length > 0) {
+        receiptInitialSelectedIds = rowIndices.slice();
+      } else {
+        var currentRows = getFilteredRowsForCurrentTab();
+        receiptInitialSelectedIds = currentRows.length > 0 ? [currentRows[0].rowIndex_] : [];
+      }
       openModal('invoiceShareModal');
+      switchReceiptFilterMode(defaultFilterMode || 'selected');
     }
 
     function shareInvoiceData() {
